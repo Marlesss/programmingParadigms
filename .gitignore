@@ -1,7 +1,7 @@
 # Do not store hidden files and directories, including .idea project
 .*
 *.iml
-
+/java-solutions/Tests/*
 # Do not store anything starting with _
 _*
 
