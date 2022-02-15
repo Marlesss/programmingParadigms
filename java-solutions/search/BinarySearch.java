@@ -16,8 +16,10 @@ public class BinarySearch {
 //        System.out.println(recursiveSearch(x, a, 0, a.length));
     }
 
-    // Pred: a[a.length - 1] <= x && a.length > 0
-    // Post: a[R] <= x && R - min available && 0 <= R < a.length
+    // Pred: a - sorted non-ascending
+    // Post: a.length == 0 && R = 0 ||
+    //       a.length > 0 &&
+    //       (a[a.length - 1] > x && R = a.length || a[R] <= x && R - min available && 0 <= R < a.length)
     public static int iterativusSearch(final int x, final int[] a) {
         int n = a.length;
         if (n == 0) {
@@ -46,8 +48,10 @@ public class BinarySearch {
         return r;
     }
 
-    // Pred: l >= 0 && r >= 0 && r <= a.length && l < r && a[l] > x && a[r] <= x && a[a.length - 1] <= x && a.length > 0
-    // Post: a[R] <= x && R - min available && l <= R < r
+    // Pred: a - sorted non-ascending && (l == 0 && r == a.length || l < r && a[l] > x && a[r] <= x)
+    // Post: a.length == 0 && R = 0 ||
+    //       a.length > 0 &&
+    //       (a[a.length - 1] > x && R = a.length || a[R] <= x && R - min available && l <= R < r)
     public static int recursiveSearch(final int x, final int[] a, final int l, final int r) {
         if (a.length == 0 || r <= l) {
             return 0;
