@@ -3,16 +3,20 @@ package search;
 import java.util.Arrays;
 
 public class BinarySearch {
+    // Pred:
+    // for i 0..(a.length - 1) int(args[i]) &&
+    // for i 2..(a.length - 1) int(args[i]) >= int(args[i - 1])
+    // Post: a[R] <= x || R == 0 || R == n
     public static void main(final String[] args) {
+        // x == int(args[0])
         int x = Integer.parseInt(args[0]);
+        // a.length == x
         int[] a = new int[args.length - 1];
+        // for i 1..(a.length - 1) int(args[i])
         for (int i = 1; i < args.length; i++) {
             a[i - 1] = Integer.parseInt(args[i]);
         }
-//        System.err.println(x + "|" + Arrays.toString(a));
-//        System.err.println(iterativusSearch(x, a));
         System.out.println(iterativusSearch(x, a));
-//        System.err.println(recursiveSearch(x, a, 0, a.length));
 //        System.out.println(recursiveSearch(x, a, 0, a.length));
     }
 
@@ -53,7 +57,7 @@ public class BinarySearch {
     //       a.length > 0 &&
     //       (a[a.length - 1] > x && R = a.length || a[R] <= x && R - min available && l <= R < r)
     public static int recursiveSearch(final int x, final int[] a, final int l, final int r) {
-        if (a.length == 0 || r <= l) {
+        if (a.length == 0) {
             return 0;
         }
         // a.length > 0 && l < r
