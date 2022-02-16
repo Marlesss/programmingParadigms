@@ -21,6 +21,7 @@ public class BinarySearchShift {
         }
         // n > 0
         int l = -1, r = n, m;
+        // a[l] > a[n - 1] && a[r] <= a[n - 1] || l == -1 && r == n
         while (r - l > 1) {
             // a[l] > a[n - 1] && a[r] <= a[n - 1] && r - l > 1
             m = (l + r) / 2;

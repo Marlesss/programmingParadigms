@@ -33,6 +33,7 @@ public class BinarySearch {
         if (a[0] <= x) {
             return 0;
         }
+        // a[l] > a[x] && a[r] <= a[x] || l == 0 && r == n
         while (r - l > 1) {
             // a[l] > x && a[r] <= x && r - l > 1
             m = (l + r) / 2;
