@@ -2,6 +2,7 @@
 .*
 *.iml
 /java-solutions/Tests/*
+/out/*
 # Do not store anything starting with _
 _*
 

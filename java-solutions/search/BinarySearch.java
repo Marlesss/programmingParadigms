@@ -6,11 +6,10 @@ public class BinarySearch {
     // Pred:
     // for i 0..(a.length - 1) int(args[i]) &&
     // for i 2..(a.length - 1) int(args[i]) >= int(args[i - 1])
-    // Post: a[R] <= x || R == 0 || R == n
+    // Post: a[R] <= x && R - min available || R == n
     public static void main(final String[] args) {
         // x == int(args[0])
         int x = Integer.parseInt(args[0]);
-        // a.length == x
         int[] a = new int[args.length - 1];
         // for i 1..(a.length - 1) int(args[i])
         for (int i = 1; i < args.length; i++) {
@@ -33,7 +32,7 @@ public class BinarySearch {
         if (a[0] <= x) {
             return 0;
         }
-        // a[l] > a[x] && a[r] <= a[x] || l == 0 && r == n
+        // a[l] > x && a[r] <= x || l == 0 && r == n
         while (r - l > 1) {
             // a[l] > x && a[r] <= x && r - l > 1
             m = (l + r) / 2;
