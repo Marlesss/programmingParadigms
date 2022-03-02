@@ -1,6 +1,6 @@
 package queue;
 
-public class ArrayQueueTest {
+public class ArrayQueueMyTest {
     public static void main(String[] args) {
         ArrayQueue queue1 = new ArrayQueue();
         ArrayQueue queue2 = new ArrayQueue();
