@@ -62,7 +62,7 @@ public class ArrayQueueModule {
     }
 
     // Pred: element != null
-    // Post: n' == n && immutable(1, n) && a[R] == element && R - min available
+    // Post: n' == n && immutable(1, n) && (a[R] == element && R - min available || R == -1 && element not in a)
     public static int indexOf(Object element) {
         assert element != null;
         for (int i = left; i < right; i++) {
@@ -74,7 +74,7 @@ public class ArrayQueueModule {
     }
 
     // Pred: element != null
-    // Post: n' == n && immutable(1, n) && a[R] == element && R - max available
+    // Post: n' == n && immutable(1, n) && (a[R] == element && R - max available || R == -1 && element not in a)
     public static int lastIndexOf(Object element) {
         assert element != null;
         for (int i = right - 1; i >= left; i--) {
