@@ -8,12 +8,15 @@ public class ArrayQueueTest {
             queue1.enqueue("e_1_" + i);
             queue2.enqueue("e_2_" + i);
         }
-        dump(queue1);
-        dump(queue2);
+        dump(queue1, "e_1_");
+        dump(queue2, "e_2_");
     }
 
-    private static void dump(ArrayQueue queue) {
+    private static void dump(ArrayQueue queue, String prefix) {
         while (!queue.isEmpty()) {
+            for (int i = 0; i < 5; i++) {
+                System.out.println(i + " " + queue.indexOf(prefix + i) + " " + queue.lastIndexOf(prefix + i));
+            }
             System.out.println(queue.size() + " " + queue.dequeue());
         }
     }
