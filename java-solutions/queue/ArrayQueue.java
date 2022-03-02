@@ -54,7 +54,7 @@ public class ArrayQueue {
     }
 
     // Pred: True
-    // Post: n' = 0 && for i=1..n a'[i] = null
+    // Post: n' = 0
     public void clear() {
         elements = new Object[2];
         left = 0;
