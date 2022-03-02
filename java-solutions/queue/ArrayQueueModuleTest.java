@@ -6,6 +6,9 @@ public class ArrayQueueModuleTest {
             ArrayQueueModule.enqueue("e" + i);
         }
         while (!ArrayQueueModule.isEmpty()) {
+            for (int i = 0; i < 5; i++) {
+                System.out.println(i + " " + ArrayQueueModule.indexOf("e" + i) + " " + ArrayQueueModule.lastIndexOf("e" + i));
+            }
             System.out.println(ArrayQueueModule.size() + " " + ArrayQueueModule.dequeue());
         }
     }

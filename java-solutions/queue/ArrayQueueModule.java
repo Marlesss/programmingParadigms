@@ -60,4 +60,28 @@ public class ArrayQueueModule {
         left = 0;
         right = 0;
     }
+
+    // Pred: element != null
+    // Post: n' == n && immutable(1, n) && a[R] == element && R - min available
+    public static int indexOf(Object element) {
+        assert element != null;
+        for (int i = left; i < right; i++) {
+            if (elements[i] != null && elements[i].equals(element)) {
+                return i - left;
+            }
+        }
+        return -1;
+    }
+
+    // Pred: element != null
+    // Post: n' == n && immutable(1, n) && a[R] == element && R - max available
+    public static int lastIndexOf(Object element) {
+        assert element != null;
+        for (int i = right - 1; i >= left; i--) {
+            if (elements[i] != null && elements[i].equals(element)) {
+                return i - left;
+            }
+        }
+        return -1;
+    }
 }

@@ -4,8 +4,8 @@ package queue;
 import java.util.Arrays;
 
 public class ArrayQueueADT {
-    public Object[] elements = new Object[2];
-    public int left, right;
+    private Object[] elements = new Object[2];
+    private int left, right;
     // Model: a[1]..a[n]
     // Invariant: for i=1..n a[i] != null
     // Let immutable(l, r): for i=l..r: a'[i] == a[i]
@@ -60,4 +60,27 @@ public class ArrayQueueADT {
         queue.left = 0;
         queue.right = 0;
     }
-}
+
+    // Pred: element != null
+    // Post: n' == n && immutable(1, n) && a[R] == element && R - min available
+    public static int indexOf(ArrayQueueADT queue, Object element) {
+        assert element != null;
+        for (int i = queue.left; i < queue.right; i++) {
+            if (queue.elements[i] != null && queue.elements[i].equals(element)) {
+                return i - queue.left;
+            }
+        }
+        return -1;
+    }
+
+    // Pred: element != null
+    // Post: n' == n && immutable(1, n) && a[R] == element && R - max available
+    public static int lastIndexOf(ArrayQueueADT queue, Object element) {
+        assert element != null;
+        for (int i = queue.right - 1; i >= queue.left; i--) {
+            if (queue.elements[i] != null && queue.elements[i].equals(element)) {
+                return i - queue.left;
+            }
+        }
+        return -1;
+    }}
