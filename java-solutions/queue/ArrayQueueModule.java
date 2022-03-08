@@ -41,14 +41,14 @@ public class ArrayQueueModule {
     // Pred: n > 0
     // Post: n' == n && immutable(n) && R == a[1]
     public static Object element() {
-        assert right != left;
+        assert size() != 0;
         return elements[left];
     }
 
     // Pred: n > 0
     // Post: n' == n - 1 && R = a[1] && for i = 1..n - 1 a'[i] = a[i + 1]
     public static Object dequeue() {
-        assert right != left;
+        assert size() != 0;
         Object val = elements[left];
         elements[left] = null;
         left = (left + 1) % elements.length;

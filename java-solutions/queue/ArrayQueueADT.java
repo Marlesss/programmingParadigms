@@ -41,14 +41,14 @@ public class ArrayQueueADT {
     // Pred: n > 0
     // Post: n' == n && immutable(n) && R == a[1]
     public static Object element(ArrayQueueADT queue) {
-        assert queue.right != queue.left;
+        assert size(queue) != 0;
         return queue.elements[queue.left];
     }
 
     // Pred: n > 0
     // Post: n' == n - 1 && R = a[1] && for i = 1..n - 1 a'[i] = a[i + 1]
     public static Object dequeue(ArrayQueueADT queue) {
-        assert queue.right != queue.left;
+        assert size(queue) != 0;
         Object val = queue.elements[queue.left];
         queue.elements[queue.left] = null;
         queue.left = (queue.left + 1) % queue.elements.length;

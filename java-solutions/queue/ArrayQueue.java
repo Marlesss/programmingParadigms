@@ -3,7 +3,7 @@ package queue;
 
 import java.util.Arrays;
 
-public class ArrayQueue {
+public class ArrayQueue extends AbstractQueue {
     private Object[] elements = new Object[2];
     private int left, right;
     // Model: a[1]..a[n]
@@ -12,8 +12,7 @@ public class ArrayQueue {
 
     // Pred: element != null
     // Post: n' = n + 1 && a[n'] == element && immutable(n)
-    public void enqueue(Object element) {
-        assert element != null;
+    protected void enqueueImpl(Object element) {
         elements[right++] = element;
         ensureCapacity();
     }
@@ -40,15 +39,13 @@ public class ArrayQueue {
 
     // Pred: n > 0
     // Post: n' == n && immutable(n) && R == a[1]
-    public Object element() {
-        assert right != left;
+    protected Object elementImpl() {
         return elements[left];
     }
 
     // Pred: n > 0
     // Post: n' == n - 1 && R = a[1] && for i = 1..n - 1 a'[i] = a[i + 1]
-    public Object dequeue() {
-        assert right != left;
+    protected Object dequeueImpl() {
         Object val = elements[left];
         elements[left] = null;
         left = (left + 1) % elements.length;
@@ -64,12 +61,6 @@ public class ArrayQueue {
     }
 
     // Pred: True
-    // Post: n' == n && immutable(n) && R = (n == 0)
-    public boolean isEmpty() {
-        return right == left;
-    }
-
-    // Pred: True
     // Post: n' = 0
     public void clear() {
         elements = new Object[2];
@@ -79,8 +70,7 @@ public class ArrayQueue {
 
     // Pred: element != null
     // Post: n' == n && immutable(n) && (a[R] == element && R - min available || R == -1 && element not in a)
-    public int indexOf(Object element) {
-        assert element != null;
+    protected int indexOfImpl(Object element) {
         if (left <= right) {
             for (int i = left; i < right; i++) {
                 if (elements[i].equals(element)) {
@@ -104,8 +94,7 @@ public class ArrayQueue {
 
     // Pred: element != null
     // Post: n' == n && immutable(n) && (a[R] == element && R - max available || R == -1 && element not in a)
-    public int lastIndexOf(Object element) {
-        assert element != null;
+    protected int lastIndexOfImpl(Object element) {
         if (left <= right) {
             for (int i = right - 1; i >= left; i--) {
                 if (elements[i] != null && elements[i].equals(element)) {
