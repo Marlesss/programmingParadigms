@@ -4,12 +4,16 @@ package queue;
 import java.util.Arrays;
 
 public class ArrayQueueModule {
+    // :NOTE: too public
     public static Object[] elements = new Object[2];
     public static int left, right;
     // Model: a[1]..a[n]
     // Invariant: for i=1..n a[i] != null
     // Let immutable(l, r): for i=l..r: a'[i] == a[i]
 
+    // :NOTE: :FIX THIS:
+    //     If you repeatedly enqueue and then dequeue one element,
+    //     your queue grows infinitely in size. It shouldn't.
     // Pred: element != null
     // Post: n' = n + 1 && a[n'] == element && immutable(1, n)
     public static void enqueue(Object element) {
