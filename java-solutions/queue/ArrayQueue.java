@@ -28,13 +28,12 @@ public class ArrayQueue {
             return;
         }
         if (right == left) {
-            Object buffer[] = new Object[elements.length * 2];
+            Object[] buffer = new Object[elements.length * 2];
             System.arraycopy(elements, left, buffer, 0, elements.length - left);
             System.arraycopy(elements, 0, buffer, elements.length - left, right);
             right = right + elements.length - left;
             left = 0;
             elements = buffer;
-            return;
         }
     }
 
