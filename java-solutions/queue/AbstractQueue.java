@@ -1,5 +1,7 @@
 package queue;
 
+import java.util.function.Predicate;
+
 public abstract class AbstractQueue implements Queue {
     protected int size;
     // Model: a[1]..a[n]
@@ -64,51 +66,65 @@ public abstract class AbstractQueue implements Queue {
         return size() == 0;
     }
 
-    // Pred: element != null
-    // Post: n' == n && immutable(n) && (a[R] == element && R - min available || R == -1 && element not in a)
-    public int indexOf(Object element) {
-        assert element != null;
-        if (size() == 0) {
-            return -1;
-        }
-        int i = 0;
-        Object current = getHead();
-        while (current != null) {
-            if (nodeEquals(current, element)) {
-                return i;
-            }
-            current = getNext(current, i);
-            i++;
-        }
-        return -1;
-    }
-
     protected abstract boolean nodeEquals(Object node, Object element);
 
     protected abstract Object getHead();
 
     protected abstract Object getNext(Object current, int i);
 
-    // Pred: element != null
-    // Post: n' == n && immutable(n) && (a[R] == element && R - max available || R == -1 && element not in a)
-    public int lastIndexOf(Object element) {
-        assert element != null;
-        if (size() == 0) {
-            return -1;
-        }
-        int i = size() - 1;
-        Object current = getTail();
-        while (current != null) {
-            if (nodeEquals(current, element)) {
-                return i;
-            }
-            current = getPrev(current, i);
-            i--;
-        }
-        return -1;
-    }
 
     protected abstract Object getPrev(Object current, int i);
 
     protected abstract Object getTail();
+
+    // Pred: element != null
+    // Post: n' == n && immutable(n) && (a[R] == element && R - min available || R == -1 && element not in a)
+    public int indexOf(Object element) {
+        assert element != null;
+        return indexIf(equalsPredicate(element));
+    }
+
+    private Predicate<Object> equalsPredicate(Object element) {
+        return o -> o.equals(element);
+    }
+
+    // Pred: element != null
+    // Post: n' == n && immutable(n) && (a[R] == element && R - max available || R == -1 && element not in a)
+    public int lastIndexOf(Object element) {
+        assert element != null;
+        return lastIndexIf(equalsPredicate(element));
+    }
+
+
+    public int indexIf(Predicate<Object> predicate) {
+        return searchByPredicate(0, getHead(), 1, predicate);
+    }
+
+    public int lastIndexIf(Predicate<Object> predicate) {
+        return searchByPredicate(size() - 1, getTail(), -1, predicate);
+    }
+
+    private int searchByPredicate(int startI, Object startNode, int delta, Predicate<Object> predicate) {
+        assert delta == -1 || delta == 1;
+        if (size() == 0) {
+            return -1;
+        }
+        int i = startI;
+        Object current = startNode;
+        while (current != null) {
+            if (testPredicate(current, predicate)) {
+                return i;
+            }
+            if (delta == -1) {
+                current = getPrev(current, i);
+            } else {
+                current = getNext(current, i);
+            }
+            i += delta;
+        }
+        return -1;
+
+    }
+
+    protected abstract boolean testPredicate(Object current, Predicate<Object> predicate);
 }

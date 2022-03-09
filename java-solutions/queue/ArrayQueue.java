@@ -2,6 +2,7 @@ package queue;
 
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 public class ArrayQueue extends AbstractQueue {
     private Object[] elements = new Object[2];
@@ -68,33 +69,31 @@ public class ArrayQueue extends AbstractQueue {
 
     @Override
     protected Object getHead() {
-        if (right == 0) {
-            return elements[elements.length - 1];
-        }
-        return elements[right];
+        return elements[left];
     }
 
     @Override
     protected Object getNext(Object element, int i) {
-        return elements[(i + 1) % elements.length];
+        return elements[(left + i + 1) % elements.length];
     }
 
     @Override
     protected Object getPrev(Object current, int i) {
-        i -= 1;
-        if (i < 0) {
-            i += elements.length;
-        }
-        return elements[i];
+        return elements[(left + i - 1 + elements.length) % elements.length];
     }
 
     @Override
     protected Object getTail() {
-        return elements[left];
+        return elements[(right - 1 + elements.length) % elements.length];
     }
 
     @Override
     protected boolean nodeEquals(Object node, Object element) {
         return node.equals(element);
+    }
+
+    @Override
+    protected boolean testPredicate(Object element, Predicate<Object> predicate) {
+        return predicate.test(element);
     }
 }

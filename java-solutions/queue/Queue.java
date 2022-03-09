@@ -1,6 +1,7 @@
 package queue;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 public interface Queue {
     // Model: a[1]..a[n]
@@ -38,4 +39,8 @@ public interface Queue {
     // Pred: element != null
     // Post: n' == n && immutable(n) && (a[R] == element && R - max available || R == -1 && element not in a)
     int lastIndexOf(Object element);
+
+    int indexIf(Predicate<Object> predicate);
+
+    int lastIndexIf(Predicate<Object> predicate);
 }

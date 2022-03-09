@@ -1,6 +1,7 @@
 package queue;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 public class LinkedQueue extends AbstractQueue {
     private static class Node {
@@ -25,7 +26,7 @@ public class LinkedQueue extends AbstractQueue {
     // Post: n' = n + 1 && a[n'] == element && immutable(n)
     @Override
     protected void initImpl(Object element) {
-        back = new Node(element, back);
+        back = new Node(element, null);
         front = back;
     }
 
@@ -68,14 +69,14 @@ public class LinkedQueue extends AbstractQueue {
     // Pred: element != null
     // Post: n' == n && immutable(n) && (a[R] == element && R - min available || R == -1 && element not in a)
     @Override
-    protected Node getNext(Object element, int i) {
-        Node current = (Node) element;
+    protected Node getNext(Object node, int i) {
+        Node current = (Node) node;
         return current.next;
     }
 
     @Override
-    protected Object getPrev(Object element, int i) {
-        Node current = (Node) element;
+    protected Object getPrev(Object node, int i) {
+        Node current = (Node) node;
         return current.prev;
     }
 
@@ -86,7 +87,13 @@ public class LinkedQueue extends AbstractQueue {
 
     @Override
     protected boolean nodeEquals(Object node, Object element) {
-        Node current = (Node) element;
+        Node current = (Node) node;
         return current.element.equals(element);
+    }
+
+    @Override
+    protected boolean testPredicate(Object node, Predicate<Object> predicate) {
+        Node current = (Node) node;
+        return predicate.test(current.element);
     }
 }
