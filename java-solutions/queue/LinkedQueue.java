@@ -14,7 +14,6 @@ public class LinkedQueue extends AbstractQueue {
         }
     }
 
-    private int size;
     private Node back;
     private Node front;
 
@@ -24,76 +23,70 @@ public class LinkedQueue extends AbstractQueue {
 
     // Pred: element != null
     // Post: n' = n + 1 && a[n'] == element && immutable(n)
+    @Override
+    protected void initImpl(Object element) {
+        back = new Node(element, back);
+        front = back;
+    }
+
+    @Override
     protected void enqueueImpl(Object element) {
-        if (size == 0) {
-            back = new Node(element, back);
-            front = back;
-        } else {
-            Node newBack = new Node(element, back);
-            back.next = newBack;
-            back = newBack;
-        }
-        size++;
+        Node newBack = new Node(element, back);
+        back.next = newBack;
+        back = newBack;
     }
 
     // Pred: n > 0
     // Post: n' == n && immutable(n) && R == a[1]
+    @Override
     protected Object elementImpl() {
         return front.element;
     }
 
     // Pred: n > 0
     // Post: n' == n - 1 && R = a[1] && for i = 1..n - 1 a'[i] = a[i + 1]
-    protected Object dequeueImpl() {
-        Object result = front.element;
+    @Override
+    protected void dequeueImpl() {
         front = front.next;
         if (front != null)
             front.prev = null;
-        size--;
-        return result;
-    }
-
-    // Pred: True
-    // Post: n' == n && immutable(n) && R = n
-    public int size() {
-        return size;
     }
 
     // Pred: True
     // Post: n' = 0
-    public void clear() {
-        size = 0;
+    @Override
+    protected void clearImpl() {
         back = null;
         front = null;
     }
 
-    // Pred: element != null
-    // Post: n' == n && immutable(n) && (a[R] == element && R - min available || R == -1 && element not in a)
-    protected int indexOfImpl(Object element) {
-        int i = 0;
-        Node current = front;
-        while (current != null) {
-            if (current.element.equals(element)) {
-                return i;
-            }
-            i++;
-            current = current.next;
-        }
-        return -1;
+    @Override
+    protected Node getHead() {
+        return front;
     }
 
     // Pred: element != null
-    // Post: n' == n && immutable(n) && (a[R] == element && R - max available || R == -1 && element not in a)
-    protected int lastIndexOfImpl(Object element) {
-        int i = size - 1;
-        Node current = back;
-        while (current != null) {
-            if (current.element.equals(element)) {
-                return i;
-            }
-            i--;
-            current = current.prev;
-        }
-        return -1;
+    // Post: n' == n && immutable(n) && (a[R] == element && R - min available || R == -1 && element not in a)
+    @Override
+    protected Node getNext(Object element, int i) {
+        Node current = (Node) element;
+        return current.next;
+    }
+
+    @Override
+    protected Object getPrev(Object element, int i) {
+        Node current = (Node) element;
+        return current.prev;
+    }
+
+    @Override
+    protected Object getTail() {
+        return back;
+    }
+
+    @Override
+    protected boolean nodeEquals(Object node, Object element) {
+        Node current = (Node) element;
+        return current.element.equals(element);
     }
 }
