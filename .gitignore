@@ -2,6 +2,9 @@
 .*
 *.iml
 /java-solutions/Tests/*
+*Test.java
+*Tester.java
+/java-solutions/expression/common/
 /out/*
 # Do not store anything starting with _
 _*
@@ -11,3 +14,14 @@ _*
 
 # Store .git files
 !.git*
+/java-solutions/base/
+/java-solutions/expression/exceptions/ExceptionsTestSet.java
+/java-solutions/expression/exceptions/package-info.java
+/java-solutions/expression/exceptions/TripleParser.java
+/java-solutions/expression/Expression.java
+/java-solutions/expression/package-info.java
+/java-solutions/expression/ToMiniString.java
+/java-solutions/expression/TripleExpression.java
+/java-solutions/expression/parser/TripleParser.java
+/java-solutions/expression/parser/ParserTestSet.java
+/java-solutions/expression/parser/Operations.java

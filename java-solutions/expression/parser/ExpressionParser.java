@@ -1,7 +1,6 @@
-package expression.exceptions;
+package expression.parser;
 
-import expression.SuperExpression;
-import expression.TripleExpression;
+import expression.*;
 
 import java.util.Map;
 
@@ -35,42 +34,37 @@ public class ExpressionParser implements Parser {
     private SuperExpression parseExpression(BaseParser parser, int minPriority) {
         // System.err.println("Need to parse: " + ((StringSource) parser.source).rest());
         SuperExpression first = parseValue(parser);
-        boolean wasWhitespace;
         while (true) {
-            wasWhitespace = parser.skipWhitespace();
+            parser.skipWhitespace();
             if (parser.eof() || parser.test(')')) {
                 return first;
             }
-            int operationPriority = getNextOperationPriority(parser, !(first instanceof Const || first instanceof Variable) || wasWhitespace);
+            int operationPriority = getNextOperationPriority(parser);
             if (operationPriority <= minPriority) {
                 return first;
             }
-            String operation = parseBinaryOperation(parser, !(first instanceof Const || first instanceof Variable) || wasWhitespace);
-            wasWhitespace = parser.skipWhitespace();
+            String operation = parseBinaryOperation(parser);
 //            System.err.println("parsing: first = " + first + ", operation = " + operation);
             SuperExpression second = parseExpression(parser, operationPriority);
             if (operation.equals("+")) {
-                first = new CheckedAdd(first, second);
+                first = new Add(first, second);
             } else if (operation.equals("-")) {
-                first = new CheckedSubtract(first, second);
+                first = new Subtract(first, second);
             } else if (operation.equals("*")) {
-                first = new CheckedMultiply(first, second);
+                first = new Multiply(first, second);
             } else if (operation.equals("/")) {
-                first = new CheckedDivide(first, second);
+                first = new Divide(first, second);
             } else if (operation.equals("min")) {
-                first = new CheckedMin(first, second);
+                first = new Min(first, second);
             } else if (operation.equals("max")) {
-                first = new CheckedMax(first, second);
+                first = new Max(first, second);
             } else {
                 throw parser.error("Unknown binary operation: " + operation);
-            }
-            if (operation.length() > 1 && second instanceof Variable && !wasWhitespace) {
-                throw parser.error("Expected for Whitespace");
             }
         }
     }
 
-    private String parseBinaryOperation(BaseParser parser, boolean wasWhitespace) {
+    private String parseBinaryOperation(BaseParser parser) {
         parser.skipWhitespace();
         if (parser.take('+')) {
             return "+";
@@ -83,9 +77,6 @@ public class ExpressionParser implements Parser {
         }
         if (parser.take('/')) {
             return "/";
-        }
-        if (!wasWhitespace) {
-            throw parser.error("Expected for Whitespace");
         }
         if (parser.take('m')) {
             if (parser.take('a')) {
@@ -100,15 +91,12 @@ public class ExpressionParser implements Parser {
         throw parser.error("Expected binary operation, took: " + parser.take());
     }
 
-    private int getNextOperationPriority(BaseParser parser, boolean wasWhitespace) {
+    private int getNextOperationPriority(BaseParser parser) {
         if (parser.test('+') || parser.test('-')) {
             return priority.get("+");
         }
         if (parser.test('*') || parser.test('/')) {
             return priority.get("*");
-        }
-        if (!wasWhitespace) {
-            throw parser.error("Expected for Whitespace");
         }
         if (parser.test('m')) {
             return priority.get("min");
@@ -131,33 +119,8 @@ public class ExpressionParser implements Parser {
                 getNums(parser, sb);
                 return new Const(Integer.parseInt(sb.toString()));
             }
-            return new CheckedNegate(parseValue(parser));
+            return new Negate(parseValue(parser));
         }
-        if (parser.take('a')) {
-            parser.expect('b');
-            parser.expect('s');
-            parser.skipWhitespace();
-            parser.expect('(');
-            SuperExpression value = parseValue(parser);
-            parser.skipWhitespace();
-            parser.expect(')');
-            return new CheckedAbs(value);
-        }
-        if (parser.take('l')) {
-            parser.expect('0');
-            if (parser.test('x') || parser.test('y') || parser.test('z') || parser.between('0', '9')) {
-                throw parser.error("Expected for Whitespace");
-            }
-            return new CheckedLZerores(parseValue(parser));
-        }
-        if (parser.take('t')) {
-            parser.expect('0');
-            if (parser.test('x') || parser.test('y') || parser.test('z') || parser.between('0', '9')) {
-                throw parser.error("Expected for Whitespace");
-            }
-            return new CheckedTZeroes(parseValue(parser));
-        }
-
         if (parser.between('0', '9')) {
             StringBuilder sb = new StringBuilder();
             getNums(parser, sb);
