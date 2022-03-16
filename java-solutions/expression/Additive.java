@@ -1,6 +1,6 @@
 package expression;
 
-import expression.exceptions.DBZExcpetion;
+import expression.exceptions .DBZExcpetion;
 import expression.exceptions.EvaluateException;
 import expression.exceptions.OverflowException;
 

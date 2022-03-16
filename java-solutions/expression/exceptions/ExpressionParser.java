@@ -2,11 +2,12 @@ package expression.exceptions;
 
 import expression.SuperExpression;
 import expression.Const;
+import expression.TripleExpression;
 import expression.Variable;
 
 import java.util.Map;
 
-public class ExpressionParser implements Parser {
+public class ExpressionParser implements TripleParser {
     private final Map<String, Integer> priority = Map.of(
             "min", 1,
             "max", 1,
