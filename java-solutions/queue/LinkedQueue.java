@@ -60,40 +60,4 @@ public class LinkedQueue extends AbstractQueue {
         back = null;
         front = null;
     }
-
-    @Override
-    protected Node getHead() {
-        return front;
-    }
-
-    // Pred: element != null
-    // Post: n' == n && immutable(n) && (a[R] == element && R - min available || R == -1 && element not in a)
-    @Override
-    protected Node getNext(Object node, int i) {
-        Node current = (Node) node;
-        return current.next;
-    }
-
-    @Override
-    protected Object getPrev(Object node, int i) {
-        Node current = (Node) node;
-        return current.prev;
-    }
-
-    @Override
-    protected Object getTail() {
-        return back;
-    }
-
-    @Override
-    protected boolean nodeEquals(Object node, Object element) {
-        Node current = (Node) node;
-        return current.element.equals(element);
-    }
-
-    @Override
-    protected boolean testPredicate(Object node, Predicate<Object> predicate) {
-        Node current = (Node) node;
-        return predicate.test(current.element);
-    }
 }

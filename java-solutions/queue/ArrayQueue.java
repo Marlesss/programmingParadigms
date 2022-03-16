@@ -66,34 +66,4 @@ public class ArrayQueue extends AbstractQueue {
         left = 0;
         right = 0;
     }
-
-    @Override
-    protected Object getHead() {
-        return elements[left];
-    }
-
-    @Override
-    protected Object getNext(Object element, int i) {
-        return elements[(left + i + 1) % elements.length];
-    }
-
-    @Override
-    protected Object getPrev(Object current, int i) {
-        return elements[(left + i - 1 + elements.length) % elements.length];
-    }
-
-    @Override
-    protected Object getTail() {
-        return elements[(right - 1 + elements.length) % elements.length];
-    }
-
-    @Override
-    protected boolean nodeEquals(Object node, Object element) {
-        return node.equals(element);
-    }
-
-    @Override
-    protected boolean testPredicate(Object element, Predicate<Object> predicate) {
-        return predicate.test(element);
-    }
 }

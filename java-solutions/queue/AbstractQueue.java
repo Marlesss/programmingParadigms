@@ -66,17 +66,6 @@ public abstract class AbstractQueue implements Queue {
         return size() == 0;
     }
 
-    protected abstract boolean nodeEquals(Object node, Object element);
-
-    protected abstract Object getHead();
-
-    protected abstract Object getNext(Object current, int i);
-
-
-    protected abstract Object getPrev(Object current, int i);
-
-    protected abstract Object getTail();
-
     // Pred: element != null
     // Post: n' == n && immutable(n) && (a[R] == element && R - min available || R == -1 && element not in a)
     public int indexOf(Object element) {
@@ -97,34 +86,26 @@ public abstract class AbstractQueue implements Queue {
 
 
     public int indexIf(Predicate<Object> predicate) {
-        return searchByPredicate(0, getHead(), 1, predicate);
+        return searchByPredicate(true, predicate);
     }
 
     public int lastIndexIf(Predicate<Object> predicate) {
-        return searchByPredicate(size() - 1, getTail(), -1, predicate);
+        return searchByPredicate(false, predicate);
     }
 
-    private int searchByPredicate(int startI, Object startNode, int delta, Predicate<Object> predicate) {
-        assert delta == -1 || delta == 1;
+    private int searchByPredicate(boolean first, Predicate<Object> predicate) {
         if (size() == 0) {
             return -1;
         }
-        int i = startI;
-        Object current = startNode;
-        while (current != null) {
-            if (testPredicate(current, predicate)) {
-                return i;
+        int ans = -1;
+        for (int i = 0; i < size; i++) {
+            if (predicate.test(element())) {
+                if (!first || ans == -1) {
+                    ans = i;
+                }
             }
-            if (delta == -1) {
-                current = getPrev(current, i);
-            } else {
-                current = getNext(current, i);
-            }
-            i += delta;
+            enqueue(dequeue());
         }
-        return -1;
-
+        return ans;
     }
-
-    protected abstract boolean testPredicate(Object current, Predicate<Object> predicate);
 }
