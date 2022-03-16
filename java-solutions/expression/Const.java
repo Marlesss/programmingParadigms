@@ -1,36 +1,39 @@
 package expression;
 
 public class Const implements SuperExpression {
-    private final int value;
+    private final Additive<?> cons;
 
-    public Const(int value) {
-        this.value = value;
+    public Const(int cons) {
+        this.cons = new Additive<>(cons);
+    }
+
+    public <N extends Number> Const(N cons) {
+        this.cons = new Additive<>(cons);
     }
 
     @Override
-    public int evaluate(int x) {
-        return value;
+    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x) {
+        return cons;
     }
 
     @Override
-    public int evaluate(int x, int y, int z) {
-        return value;
+    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x, Additive<T> y, Additive<T> z) {
+        return cons;
     }
 
     @Override
     public String toString() {
-        return String.valueOf(value);
+        return String.valueOf(cons);
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof Const) {
-            Const other = (Const) obj;
-            return value == other.value;
+        if (obj instanceof Const other) {
+            return cons.equals(other.cons);
         }
         return false;
     }
 
     public int hashCode() {
-        return value;
+        return cons.intValue();
     }
 }

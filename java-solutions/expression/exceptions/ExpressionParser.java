@@ -1,7 +1,8 @@
 package expression.exceptions;
 
 import expression.SuperExpression;
-import expression.TripleExpression;
+import expression.Const;
+import expression.Variable;
 
 import java.util.Map;
 
@@ -148,14 +149,14 @@ public class ExpressionParser implements Parser {
             if (parser.test('x') || parser.test('y') || parser.test('z') || parser.between('0', '9')) {
                 throw parser.error("Expected for Whitespace");
             }
-            return new CheckedLZerores(parseValue(parser));
+            return new LZerores(parseValue(parser));
         }
         if (parser.take('t')) {
             parser.expect('0');
             if (parser.test('x') || parser.test('y') || parser.test('z') || parser.between('0', '9')) {
                 throw parser.error("Expected for Whitespace");
             }
-            return new CheckedTZeroes(parseValue(parser));
+            return new TZeroes(parseValue(parser));
         }
 
         if (parser.between('0', '9')) {

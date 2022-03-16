@@ -6,13 +6,13 @@ public class Divide extends BinaryOperation {
     }
 
     @Override
-    protected String getOperation() {
-        return "/";
+    protected Additive<?> calc(Additive<?> x, Additive<?> y) {
+        return x.divide(y, false);
     }
 
     @Override
-    protected int calc(int x, int y) {
-        return x / y;
+    protected String getOperation() {
+        return "/";
     }
 
 }

@@ -6,13 +6,12 @@ public class Min extends BinaryOperation {
     }
 
     @Override
-    protected String getOperation() {
-        return "min";
+    protected Additive<?> calc(Additive<?> x, Additive<?> y) {
+        return x.min(y);
     }
 
     @Override
-    protected int calc(int x, int y) {
-        return Math.min(x, y);
+    protected String getOperation() {
+        return "min";
     }
-
 }

@@ -8,12 +8,12 @@ public class Variable implements SuperExpression {
     }
 
     @Override
-    public int evaluate(int x) {
+    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x) {
         return x;
     }
 
     @Override
-    public int evaluate(int x, int y, int z) {
+    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x, Additive<T> y, Additive<T> z) {
         if (name.equals("x")) {
             return x;
         }
@@ -23,7 +23,7 @@ public class Variable implements SuperExpression {
         if (name.equals("z")) {
             return z;
         }
-        return 0;
+        return x.neutral();
     }
 
     @Override
@@ -32,8 +32,7 @@ public class Variable implements SuperExpression {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof Variable) {
-            Variable other = (Variable) obj;
+        if (obj instanceof Variable other) {
             return name.equals(other.name);
         }
         return false;

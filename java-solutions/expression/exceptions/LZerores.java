@@ -4,31 +4,31 @@ import expression.Additive;
 import expression.SuperExpression;
 import expression.UnaryOperation;
 
-public class CheckedAbs extends UnaryOperation {
-
-    public CheckedAbs(SuperExpression expression) {
+public class LZerores extends UnaryOperation {
+    public LZerores(SuperExpression expression) {
         super(expression);
     }
 
     @Override
     protected Additive<?> calc(Additive<?> x) {
-        return x.abs(true);
+        return x.lZeroes();
     }
 
 //    @Override
 //    protected int calc(int x) {
-//        if (x >= 0) {
-//            return x;
+//        if (x < 0) {
+//            return 0;
 //        }
-//        int result = -x;
-//        if (result <= x) {
-//            throw new OverflowException("Overflow received by executing " + this);
+//        int ans = 0;
+//        while (x > 0) {
+//            x /= 2;
+//            ans++;
 //        }
-//        return result;
+//        return 32 - ans;
 //    }
 
     @Override
     protected String getOperation() {
-        return "abs";
+        return "l0";
     }
 }

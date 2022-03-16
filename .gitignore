@@ -25,3 +25,6 @@ _*
 /java-solutions/expression/parser/TripleParser.java
 /java-solutions/expression/parser/ParserTestSet.java
 /java-solutions/expression/parser/Operations.java
+/java-solutions/expression/generic/Tabulator.java
+/java-solutions/expression/BigDecimalExpression.java
+/java-solutions/expression/BigIntegerExpression.java

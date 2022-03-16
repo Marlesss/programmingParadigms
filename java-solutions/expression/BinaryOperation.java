@@ -1,7 +1,5 @@
 package expression;
 
-import java.math.BigInteger;
-
 abstract class BinaryOperation implements SuperExpression {
     private final SuperExpression first;
     private final SuperExpression second;
@@ -13,17 +11,16 @@ abstract class BinaryOperation implements SuperExpression {
     }
 
     @Override
-    public <T extends Number> T evaluate(T x) {
-        return calc(first.evaluate(x), second.evaluate(x));
+    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x) {
+        return calc(first.evaluateImpl(x), second.evaluateImpl(x));
     }
 
     @Override
-    public <T extends Number> T evaluate(T x, T y, T z) {
-        return calc(first.evaluate(x, y, z), second.evaluate(x, y, z));
+    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x, Additive<T> y, Additive<T> z) {
+        return calc(first.evaluateImpl(x, y, z), second.evaluateImpl(x, y, z));
     }
 
-    protected abstract <T extends Number> T calc(T x, T y);
-
+    protected abstract Additive<?> calc(Additive<?> x, Additive<?> y);
 
     @Override
     public String toString() {
@@ -31,8 +28,7 @@ abstract class BinaryOperation implements SuperExpression {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof BinaryOperation) {
-            BinaryOperation other = (BinaryOperation) obj;
+        if (obj instanceof BinaryOperation other) {
             return getOperation().equals(other.getOperation()) && first.equals(other.first) &&
                     second.equals(other.second);
         }
@@ -44,6 +40,4 @@ abstract class BinaryOperation implements SuperExpression {
     }
 
     protected abstract String getOperation();
-
-
 }
