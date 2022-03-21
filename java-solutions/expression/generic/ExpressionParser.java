@@ -1,11 +1,10 @@
-package expression.exceptions;
-
-import expression.SuperExpression;
-import expression.TripleExpression;
+package expression.generic;
 
 import java.util.Map;
 
-public class ExpressionParser implements TripleParser {
+public class ExpressionParser<T extends Number> {
+    private final Additive<T> neutral;
+    private final boolean exceptionCheck;
     private final Map<String, Integer> priority = Map.of(
             "min", 1,
             "max", 1,
@@ -15,15 +14,16 @@ public class ExpressionParser implements TripleParser {
             "/", 3
     );
 
-    public ExpressionParser() {
-
+    public ExpressionParser(boolean exceptionCheck, Additive<T> neutral) {
+        this.neutral = neutral;
+        this.exceptionCheck = exceptionCheck;
     }
 
-    public TripleExpression parse(String expression) {
+    public SuperExpression<T> parse(String expression) {
 //        System.err.println("GOT:      " + expression);
         CharSource source = new StringSource(expression);
         BaseParser parser = new BaseParser(source);
-        SuperExpression result = parseExpression(parser, 0);
+        SuperExpression<T> result = parseExpression(parser, 0);
 //        System.err.println("RETURNED: " + result);
         parser.skipWhitespace();
         if (parser.eof()) {
@@ -32,9 +32,10 @@ public class ExpressionParser implements TripleParser {
         throw parser.error("Expected end-of-string");
     }
 
-    private SuperExpression parseExpression(BaseParser parser, int minPriority) {
+
+    private SuperExpression<T> parseExpression(BaseParser parser, int minPriority) {
         // System.err.println("Need to parse: " + ((StringSource) parser.source).rest());
-        SuperExpression first = parseValue(parser);
+        SuperExpression<T> first = parseValue(parser);
         boolean wasWhitespace;
         while (true) {
             wasWhitespace = parser.skipWhitespace();
@@ -48,19 +49,19 @@ public class ExpressionParser implements TripleParser {
             String operation = parseBinaryOperation(parser, !(first instanceof Const || first instanceof Variable) || wasWhitespace);
             wasWhitespace = parser.skipWhitespace();
 //            System.err.println("parsing: first = " + first + ", operation = " + operation);
-            SuperExpression second = parseExpression(parser, operationPriority);
+            SuperExpression<T> second = parseExpression(parser, operationPriority);
             if (operation.equals("+")) {
-                first = new CheckedAdd(first, second);
+                first = new Add<>(first, second, exceptionCheck);
             } else if (operation.equals("-")) {
-                first = new CheckedSubtract(first, second);
+                first = new Subtract<>(first, second, exceptionCheck);
             } else if (operation.equals("*")) {
-                first = new CheckedMultiply(first, second);
+                first = new Multiply<>(first, second, exceptionCheck);
             } else if (operation.equals("/")) {
-                first = new CheckedDivide(first, second);
+                first = new Divide<>(first, second, exceptionCheck);
             } else if (operation.equals("min")) {
-                first = new CheckedMin(first, second);
+                first = new Min<>(first, second);
             } else if (operation.equals("max")) {
-                first = new CheckedMax(first, second);
+                first = new Max<>(first, second);
             } else {
                 throw parser.error("Unknown binary operation: " + operation);
             }
@@ -116,10 +117,10 @@ public class ExpressionParser implements TripleParser {
         return 0;
     }
 
-    private SuperExpression parseValue(BaseParser parser) {
+    private SuperExpression<T> parseValue(BaseParser parser) {
         parser.skipWhitespace();
         if (parser.take('(')) {
-            SuperExpression result = parseExpression(parser, 0);
+            SuperExpression<T> result = parseExpression(parser, 0);
             parser.skipWhitespace();
             parser.expect(')');
             return result;
@@ -129,60 +130,77 @@ public class ExpressionParser implements TripleParser {
             if (parser.between('0', '9')) {
                 StringBuilder sb = new StringBuilder().append('-');
                 getNums(parser, sb);
-                return new Const(Integer.parseInt(sb.toString()));
+                return makeConst(sb);
             }
-            return new CheckedNegate(parseValue(parser));
+            return new Negate<>(parseValue(parser), exceptionCheck);
         }
         if (parser.take('a')) {
             parser.expect('b');
             parser.expect('s');
             parser.skipWhitespace();
             parser.expect('(');
-            SuperExpression value = parseValue(parser);
+            SuperExpression<T> value = parseValue(parser);
             parser.skipWhitespace();
             parser.expect(')');
-            return new CheckedAbs(value);
+            return new Abs<>(value, exceptionCheck);
         }
-        if (parser.take('l')) {
-            parser.expect('0');
+        if (parser.take('c')) {
+            parser.expect("ount");
             if (parser.test('x') || parser.test('y') || parser.test('z') || parser.between('0', '9')) {
                 throw parser.error("Expected for Whitespace");
             }
-            return new CheckedLZerores(parseValue(parser));
+            return new Count<>(parseValue(parser));
         }
-        if (parser.take('t')) {
-            parser.expect('0');
-            if (parser.test('x') || parser.test('y') || parser.test('z') || parser.between('0', '9')) {
-                throw parser.error("Expected for Whitespace");
-            }
-            return new CheckedTZeroes(parseValue(parser));
-        }
+//        if (parser.take('l')) {
+//            parser.expect('0');
+//            if (parser.test('x') || parser.test('y') || parser.test('z') || parser.between('0', '9')) {
+//                throw parser.error("Expected for Whitespace");
+//            }
+//            return new LZerores(parseValue(parser));
+//        }
+//        if (parser.take('t')) {
+//            parser.expect('0');
+//            if (parser.test('x') || parser.test('y') || parser.test('z') || parser.between('0', '9')) {
+//                throw parser.error("Expected for Whitespace");
+//            }
+//            return new TZeroes(parseValue(parser));
+//        }
 
         if (parser.between('0', '9')) {
             StringBuilder sb = new StringBuilder();
             getNums(parser, sb);
-            return new Const(Integer.parseInt(sb.toString()));
+            return makeConst(sb);
         }
 
         return parseVariable(parser);
+    }
+
+    private Const<T> makeConst(StringBuilder sb) {
+        return new Const<>(neutral.parseConst(sb));
     }
 
     private void getNums(BaseParser parser, StringBuilder sb) {
         while (parser.between('0', '9')) {
             sb.append(parser.take());
         }
+        if (parser.take('.')) {
+            sb.append('.');
+            while (parser.between('0', '9')) {
+                sb.append(parser.take());
+            }
+        }
     }
 
-    private SuperExpression parseVariable(BaseParser parser) {
+    private SuperExpression<T> parseVariable(BaseParser parser) {
         parser.skipWhitespace();
         if (parser.take('x')) {
-            return new Variable("x");
+            return new Variable<>("x");
         }
         if (parser.take('y')) {
-            return new Variable("y");
+            return new Variable<>("y");
         }
         if (parser.take('z')) {
-            return new Variable("z");
+            return new Variable<>("z");
         }
         throw parser.error("Expected variable");
     }

@@ -1,9 +1,13 @@
 package expression;
 
-import expression.exceptions.*;
+import expression.parser.ExpressionParser;
+
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(new ExpressionParser().parse("1 min1"));
+        int z = 0, y = 0, x = -10;
+//        System.out.println(-11 / 10);
+        System.out.println(x * (y + ((z - 1) / 10)));
     }
 }

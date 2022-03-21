@@ -1,7 +1,5 @@
 package expression;
 
-import java.math.BigInteger;
-
 abstract class BinaryOperation implements SuperExpression {
     private final SuperExpression first;
     private final SuperExpression second;
@@ -13,16 +11,16 @@ abstract class BinaryOperation implements SuperExpression {
     }
 
     @Override
-    public <T extends Number> T evaluate(T x) {
+    public int evaluate(int x) {
         return calc(first.evaluate(x), second.evaluate(x));
     }
 
     @Override
-    public <T extends Number> T evaluate(T x, T y, T z) {
+    public int evaluate(int x, int y, int z) {
         return calc(first.evaluate(x, y, z), second.evaluate(x, y, z));
     }
 
-    protected abstract <T extends Number> T calc(T x, T y);
+    protected abstract int calc(int x, int y);
 
 
     @Override
@@ -44,6 +42,4 @@ abstract class BinaryOperation implements SuperExpression {
     }
 
     protected abstract String getOperation();
-
-
 }
