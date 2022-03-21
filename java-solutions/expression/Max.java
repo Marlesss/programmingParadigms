@@ -6,13 +6,13 @@ public class Max extends BinaryOperation {
     }
 
     @Override
-    protected Additive<?> calc(Additive<?> x, Additive<?> y) {
-        return x.max(y);
+    protected String getOperation() {
+        return "max";
     }
 
     @Override
-    protected String getOperation() {
-        return "max";
+    protected int calc(int x, int y) {
+        return Math.max(x, y);
     }
 
 }

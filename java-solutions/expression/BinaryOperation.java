@@ -11,16 +11,17 @@ abstract class BinaryOperation implements SuperExpression {
     }
 
     @Override
-    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x) {
-        return calc(first.evaluateImpl(x), second.evaluateImpl(x));
+    public int evaluate(int x) {
+        return calc(first.evaluate(x), second.evaluate(x));
     }
 
     @Override
-    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x, Additive<T> y, Additive<T> z) {
-        return calc(first.evaluateImpl(x, y, z), second.evaluateImpl(x, y, z));
+    public int evaluate(int x, int y, int z) {
+        return calc(first.evaluate(x, y, z), second.evaluate(x, y, z));
     }
 
-    protected abstract Additive<?> calc(Additive<?> x, Additive<?> y);
+    protected abstract int calc(int x, int y);
+
 
     @Override
     public String toString() {
@@ -28,7 +29,8 @@ abstract class BinaryOperation implements SuperExpression {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof BinaryOperation other) {
+        if (obj instanceof BinaryOperation) {
+            BinaryOperation other = (BinaryOperation) obj;
             return getOperation().equals(other.getOperation()) && first.equals(other.first) &&
                     second.equals(other.second);
         }

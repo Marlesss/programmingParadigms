@@ -1,29 +1,29 @@
-package expression;
+package expression.generic;
 
-public class Variable implements SuperExpression {
+public class Variable<T extends Number> implements SuperExpression<T> {
     private final String name;
 
     public Variable(String name) {
+        if (!(name.equals("x") || name.equals("y") || name.equals("z"))) {
+            throw new RuntimeException("Unknown name of variable");
+        }
         this.name = name;
     }
 
     @Override
-    public int evaluate(int x) {
+    public Additive<T> evaluateImpl(Additive<T> x) {
         return x;
     }
 
     @Override
-    public int evaluate(int x, int y, int z) {
+    public Additive<T> evaluateImpl(Additive<T> x, Additive<T> y, Additive<T> z) {
         if (name.equals("x")) {
             return x;
         }
         if (name.equals("y")) {
             return y;
         }
-        if (name.equals("z")) {
-            return z;
-        }
-        return 0;
+        return z;
     }
 
     @Override
@@ -31,14 +31,15 @@ public class Variable implements SuperExpression {
         return name;
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Variable) {
-            Variable other = (Variable) obj;
+        if (obj instanceof Variable other) {
             return name.equals(other.name);
         }
         return false;
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }

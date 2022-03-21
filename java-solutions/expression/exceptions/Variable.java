@@ -1,4 +1,6 @@
-package expression;
+package expression.exceptions;
+
+import expression.SuperExpression;
 
 public class Variable implements SuperExpression {
     private final String name;

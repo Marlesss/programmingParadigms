@@ -1,13 +1,10 @@
 package expression.parser;
 
 import expression.*;
-import expression.exceptions.ParseException;
 
-import java.math.BigInteger;
 import java.util.Map;
 
 public class ExpressionParser implements TripleParser {
-    private final String mode;
     private final Map<String, Integer> priority = Map.of(
             "min", 1,
             "max", 1,
@@ -18,14 +15,10 @@ public class ExpressionParser implements TripleParser {
     );
 
     public ExpressionParser() {
-        this.mode = "u";
+
     }
 
-    public ExpressionParser(String mode) {
-        this.mode = mode;
-    }
-
-    public SuperExpression parse(String expression) {
+    public TripleExpression parse(String expression) {
 //        System.err.println("GOT:      " + expression);
         CharSource source = new StringSource(expression);
         BaseParser parser = new BaseParser(source);
@@ -124,41 +117,22 @@ public class ExpressionParser implements TripleParser {
             if (parser.between('0', '9')) {
                 StringBuilder sb = new StringBuilder().append('-');
                 getNums(parser, sb);
-                return makeConst(sb);
+                return new Const(Integer.parseInt(sb.toString()));
             }
             return new Negate(parseValue(parser));
         }
         if (parser.between('0', '9')) {
             StringBuilder sb = new StringBuilder();
             getNums(parser, sb);
-            return makeConst(sb);
+            return new Const(Integer.parseInt(sb.toString()));
         }
 
         return parseVariable(parser);
     }
 
-    private Const makeConst(StringBuilder sb) {
-        switch (mode) {
-            case "i":
-            case "u":
-                return new Const(Integer.parseInt(sb.toString()));
-            case "d":
-                return new Const(Double.parseDouble(sb.toString()));
-            case "bi":
-                return new Const(BigInteger.valueOf(Long.parseLong(sb.toString())));
-        }
-        throw new ParseException("Unknown mode");
-    }
-
     private void getNums(BaseParser parser, StringBuilder sb) {
         while (parser.between('0', '9')) {
             sb.append(parser.take());
-        }
-        if (parser.take('.')) {
-            sb.append('.');
-            while (parser.between('0', '9')) {
-                sb.append(parser.take());
-            }
         }
     }
 

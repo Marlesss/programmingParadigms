@@ -1,6 +1,9 @@
-package expression;
+package expression.exceptions;
 
-public abstract class UnaryOperation implements SuperExpression {
+import expression.Negate;
+import expression.SuperExpression;
+
+abstract class UnaryOperation implements SuperExpression {
     private final SuperExpression expression;
 
     public UnaryOperation(SuperExpression expression) {
@@ -8,16 +11,17 @@ public abstract class UnaryOperation implements SuperExpression {
     }
 
     @Override
-    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x) {
-        return calc(expression.evaluateImpl(x));
+    public int evaluate(int x) {
+        return calc(expression.evaluate(x));
     }
 
     @Override
-    public <T extends Number> Additive<?> evaluateImpl(Additive<T> x, Additive<T> y, Additive<T> z) {
-        return calc(expression.evaluateImpl(x, y, z));
+    public int evaluate(int x, int y, int z) {
+        return calc(expression.evaluate(x, y, z));
     }
 
-    protected abstract Additive<?> calc(Additive<?> x);
+    protected abstract int calc(int x);
+
 
     @Override
     public String toString() {
@@ -25,7 +29,8 @@ public abstract class UnaryOperation implements SuperExpression {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof UnaryOperation other) {
+        if (obj instanceof UnaryOperation) {
+            UnaryOperation other = (UnaryOperation) obj;
             return getOperation().equals(other.getOperation()) && expression.equals(other.expression);
         }
         return false;

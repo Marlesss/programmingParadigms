@@ -1,4 +1,6 @@
-package expression;
+package expression.exceptions;
+
+import expression.SuperExpression;
 
 public class Const implements SuperExpression {
     private final int value;

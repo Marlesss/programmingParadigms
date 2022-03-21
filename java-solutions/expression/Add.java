@@ -6,13 +6,13 @@ public class Add extends BinaryOperation {
     }
 
     @Override
-    protected Additive<?> calc(Additive<?> x, Additive<?> y) {
-        return x.add(y, false);
-    }
-
-
-    @Override
     protected String getOperation() {
         return "+";
     }
+
+    @Override
+    protected int calc(int x, int y) {
+        return x + y;
+    }
+
 }

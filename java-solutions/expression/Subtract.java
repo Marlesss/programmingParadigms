@@ -6,13 +6,13 @@ public class Subtract extends BinaryOperation {
     }
 
     @Override
-    protected Additive<?> calc(Additive<?> x, Additive<?> y) {
-        return x.subtract(y, false);
+    protected String getOperation() {
+        return "-";
     }
 
     @Override
-    protected String getOperation() {
-        return "-";
+    protected int calc(int x, int y) {
+        return x - y;
     }
 
 }
