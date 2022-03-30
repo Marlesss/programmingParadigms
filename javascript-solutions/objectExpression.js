@@ -56,6 +56,16 @@ function Divide(expr1, expr2) {
     return new BinaryOperation(expr1, expr2, (a, b) => a / b, "/");
 }
 
+function Cosh(expr1) {
+    return new UnaryOperation(expr1, Math.cosh, "cosh");
+}
+
+function Sinh(expr1) {
+    return new UnaryOperation(expr1, Math.sinh, "sinh");
+}
+
+
+
 function split(str) {
     let result = []
     let start = false;
@@ -99,6 +109,10 @@ function parse(str) {
             }
         } else if (val === "negate") {
             stack.push(new Negate(stack.pop()));
+        } else if (val === "cosh") {
+            stack.push(new Cosh(stack.pop()));
+        } else if (val === "sinh") {
+            stack.push(new Sinh(stack.pop()));
         }
     }
     return stack.pop();
