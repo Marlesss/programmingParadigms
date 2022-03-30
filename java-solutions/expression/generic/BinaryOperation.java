@@ -38,6 +38,7 @@ abstract class BinaryOperation<T extends Number> implements SuperExpression<T> {
         return false;
     }
 
+    // :NOTE: Objects.hash
     @Override
     public int hashCode() {
         return (first.hashCode() * 17 + second.hashCode()) * 17 + getOperation().hashCode();

@@ -7,6 +7,7 @@ public class GenericTabulator implements Tabulator {
     public Object[][][] tabulate(String mode, String expression, int x1, int x2, int y1, int y2, int z1, int z2) throws Exception {
 //        System.err.println("String mode = \"" + mode + "\"; String expression = \"" + expression + "\"; int x1 = " + x1 + ", x2 = " + x2 + ", y1 = " + y1 + ", y2 = " + y2 + ", z1 = " + z1 + ", z2 = " + z2 + ";");
         Number[][][] table = new Number[x2 - x1 + 1][y2 - y1 + 1][z2 - z1 + 1];
+        // :NOTE: copypaste, should be avoided
         switch (mode) {
             case "u":
             case "i":
