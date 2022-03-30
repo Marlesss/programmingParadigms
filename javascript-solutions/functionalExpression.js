@@ -2,13 +2,6 @@
 
 const cnst = x => () => x;
 const variable = name => (x, y, z) => name === "x" ? x : (name === "y" ? y : (name === "z" ? z : Infinity));
-// const variable = name => (x, y, z) => {
-//     let arr = [];
-//     arr["x"] = x;
-//     arr["y"] = y;
-//     arr["z"] = z;
-//     return arr[name];
-// }
 const binaryOperation = f => (expr1, expr2) => (x, y, z) => f(expr1(x, y, z), expr2(x, y, z));
 const unaryOperation = f => expr1 => (x, y, z) => f(expr1(x, y, z));
 const add = binaryOperation((a, b) => a + b);
