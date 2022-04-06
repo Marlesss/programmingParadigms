@@ -62,7 +62,6 @@ Variable.prototype.toString = function () {
 Variable.prototype.prefix = Variable.prototype.toString;
 Variable.prototype.postfix = Variable.prototype.toString;
 
-
 function Negate(...exprs) {
     UnlimitedOperation.call(this, (x) => -x, "negate", ...exprs);
 }
@@ -108,6 +107,7 @@ Sinh.prototype = Object.create(UnlimitedOperation.prototype);
 function Mean(...exprs) {
     UnlimitedOperation.call(this,
         (...args) => {
+        // reduce or map
             let sum = 0;
             for (let i = 0; i < args.length; i++) {
                 sum += args[i];
