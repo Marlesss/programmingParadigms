@@ -1,5 +1,40 @@
 "use strict";
 
+function UnlimitedOperation(f, sign, ...exprs) {
+    // this.f = f;
+    // this.sign = sign;
+    // this.exprs = exprs;
+    this.toString = function () {
+        let res = "";
+        for (let i = 0; i < args.length; i++) {
+            res += exprs[i].toString() + " ";
+        }
+        return res + sign;
+    }
+    this.evaluate = function (x, y, z) {
+        // println(exprs);
+        let resArgs = []
+        for (let i = 0; i < exprs.length; i++) {
+            resArgs.push(exprs[i].evaluate(x, y, z));
+        }
+        return f(...resArgs);
+    }
+    this.prefix = function () {
+        let res = sign;
+        for (let i = 0; i < exprs.length; i++) {
+            res += " " + exprs[i].prefix();
+        }
+        return "(" + res + ")";
+    }
+    this.postfix = function () {
+        let res = "";
+        for (let i = 0; i < exprs.length; i++) {
+            res += exprs[i].postfix() + " ";
+        }
+        return "(" + res + sign + ")";
+    }
+}
+
 function Const(value) {
     this.toString = function () {
         return value + "";
@@ -96,6 +131,32 @@ function Sinh(expr1) {
     return new UnaryOperation(expr1, Math.sinh, "sinh");
 }
 
+function Mean(...args) {
+    return new UnlimitedOperation(
+        (...args) => {
+            let sum = 0;
+            for (let i = 0; i < args.length; i++) {
+                sum += args[i];
+            }
+            return sum / args.length;
+        }, "mean", ...args
+    );
+}
+
+function Var(...args) {
+    return new UnlimitedOperation(
+        (...args) => {
+            let sum = 0;
+            let sumkv = 0;
+            for (let i = 0; i < args.length; i++) {
+                sum += args[i];
+                sumkv += args[i] * args[i];
+            }
+            return sumkv / args.length - (sum / args.length) * (sum / args.length);
+        }, "var", ...args
+    );
+}
+
 
 function split(str) {
     let result = []
@@ -129,21 +190,9 @@ function parse(str) {
         } else if (val === "+" || val === "-" || val === "*" || val === "/") {
             let expr2 = stack.pop();
             let expr1 = stack.pop();
-            if (val === "+") {
-                stack.push(new Add(expr1, expr2));
-            } else if (val === "-") {
-                stack.push(new Subtract(expr1, expr2));
-            } else if (val === "*") {
-                stack.push(new Multiply(expr1, expr2));
-            } else if (val === "/") {
-                stack.push(new Divide(expr1, expr2));
-            }
-        } else if (val === "negate") {
-            stack.push(new Negate(stack.pop()));
-        } else if (val === "cosh") {
-            stack.push(new Cosh(stack.pop()));
-        } else if (val === "sinh") {
-            stack.push(new Sinh(stack.pop()));
+            stack.push(makeBinaryOperation(val, expr1, expr2));
+        } else {
+            stack.push(makeUnaryOperation(val, stack.pop()));
         }
     }
     return stack.pop();
@@ -199,25 +248,64 @@ function parseElem(str, i, parseBracket) {
     throw Error("Expect bracket, number or variable, got " + str[i]);
 }
 
-function makeUnaryOperation(op, expr) {
+function parseElems(str, i, parseBracket) {
+    let exprs = [];
+    let res;
+    i = skipWhitespace(str, i);
+    do {
+        res = parseElem(str, i, parseBracket);
+        exprs.push(res[0]);
+        i = res[1];
+        i = skipWhitespace(str, i);
+    } while (elemStarts(str, i));
+    return [exprs, i];
+}
+
+function makeUnlimitedOperation(op, ...exprs) {
+    if (op === "mean") {
+        return new Mean(...exprs);
+    }
+    if (op === "var") {
+        return new Var(...exprs);
+    }
+    throw Error("Unknown unlimited operation");
+}
+
+function makeOperation(op, ...exprs) {
+    if (op === "+" || op === "-" || op === "*" || op === "/") {
+        return makeBinaryOperation(op, ...exprs);
+    }
+    if (op === "negate" || op === "cosh" || op === "sinh") {
+        return makeUnaryOperation(op, ...exprs);
+    }
+    return makeUnlimitedOperation(op, ...exprs);
+}
+
+function makeUnaryOperation(op, ...exprs) {
+    if (exprs.length !== 1) {
+        throw Error("Wrong count of arguments");
+    }
     if (op === "negate")
-        return new Negate(expr);
+        return new Negate(...exprs);
     if (op === "cosh")
-        return new Cosh(expr);
+        return new Cosh(...exprs);
     if (op === "sinh")
-        return new Sinh(expr);
+        return new Sinh(...exprs);
     throw Error("Unknown unary operation");
 }
 
-function makeBinaryOperation(op, first, second) {
+function makeBinaryOperation(op, ...exprs) {
+    if (exprs.length !== 2) {
+        throw Error("Wrong count of arguments");
+    }
     if (op === "+")
-        return new Add(first, second);
+        return new Add(...exprs);
     if (op === "-")
-        return new Subtract(first, second);
+        return new Subtract(...exprs);
     if (op === "*")
-        return new Multiply(first, second);
+        return new Multiply(...exprs);
     if (op === "/")
-        return new Divide(first, second);
+        return new Divide(...exprs);
     throw Error("Unknown binary operation");
 
 }
@@ -240,29 +328,18 @@ function parsePrefix(str) {
         let res = parseOp(str, i);
         let op = res[0];
         i = res[1];
-        i = skipWhitespace(str, i);
-        res = parseElem(str, i, parseBracket);
-        let first = res[0];
+        res = parseElems(str, i, parseBracket);
+        let exprs = res[0];
         i = res[1];
-        i = skipWhitespace(str, i);
-        if (str[i] === ')') {
-            i++;
-            res = makeUnaryOperation(op, first);
-            return [res, i];
-        }
-        res = parseElem(str, i, parseBracket);
-        let second = res[0];
-        i = res[1];
-        i = skipWhitespace(str, i);
         expect(str, i, ")");
         i++;
-        res = makeBinaryOperation(op, first, second);
+        res = makeOperation(op, ...exprs);
         return [res, i];
     }
 }
 
 function elemStarts(str, i) {
-    return i < str.length && (str[i] === "(" || str[i] === "x" || str[i] === "y" || str[i] === "z" || str[i] === "-" || !isNaN(parseFloat(str[i])))
+    return i < str.length && (str[i] === "(" || str[i] === "x" || str[i] === "y" || str[i] === "z" || (str[i] === "-" && i + 1 < str.length && !isNaN(parseFloat(str[i + 1]))) || !isNaN(parseFloat(str[i])))
 }
 
 function parsePostfix(str) {
@@ -279,32 +356,16 @@ function parsePostfix(str) {
         i = skipWhitespace(str, i);
         expect(str, i, "(");
         i++;
-        i = skipWhitespace(str, i);
-        let res = parseElem(str, i, parseBracket);
-        let first = res[0];
+        let res = parseElems(str, i, parseBracket);
+        let exprs = res[0];
         i = res[1];
-        i = skipWhitespace(str, i);
-        if (!elemStarts(str, i)) {
-            res = parseOp(str, i);
-            let op = res[0];
-            i = res[1];
-            i = skipWhitespace(str, i);
-            expect(str, i, ")");
-            i++;
-            res = makeUnaryOperation(op, first);
-            return [res, i];
-        }
-        res = parseElem(str, i, parseBracket);
-        let second = res[0];
-        i = res[1];
-        i = skipWhitespace(str, i);
         res = parseOp(str, i);
         let op = res[0];
         i = res[1];
         i = skipWhitespace(str, i);
         expect(str, i, ")");
         i++;
-        res = makeBinaryOperation(op, first, second);
+        res = makeOperation(op, ...exprs);
         return [res, i];
     }
 }
