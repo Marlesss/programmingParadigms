@@ -1,66 +1,67 @@
 "use strict";
 
 
-function UnlimitedOperation(f, sign, ...exprs) {
-    this.f = f;
+function UnlimitedOperation(calc, sign, ...exprs) {
+    this.calc = calc;
     this.sign = sign;
     this.exprs = exprs
 }
 
-UnlimitedOperation.prototype.toString = function () {
-    let res = "";
-    for (let i = 0; i < this.exprs.length; i++) {
-        res += this.exprs[i].toString() + " ";
-    }
-    return res + this.sign;
-}
-UnlimitedOperation.prototype.evaluate = function (x, y, z) {
-    let resArgs = []
-    for (let i = 0; i < this.exprs.length; i++) {
-        resArgs.push(this.exprs[i].evaluate(x, y, z));
-    }
-    return this.f(...resArgs);
-}
-UnlimitedOperation.prototype.prefix = function () {
-    let res = this.sign;
-    for (let i = 0; i < this.exprs.length; i++) {
-        res += " " + this.exprs[i].prefix();
-    }
-    return "(" + res + ")";
-}
-UnlimitedOperation.prototype.postfix = function () {
-    let res = "";
-    for (let i = 0; i < this.exprs.length; i++) {
-        res += this.exprs[i].postfix() + " ";
-    }
-    return "(" + res + this.sign + ")";
+UnlimitedOperation.prototype = {
+    stringization: function (f) {
+        return this.exprs.map(expr => f(expr)).join(" ")
+    },
+    toString: function () {
+        return this.stringization(expr => expr.toString()) + " " + this.sign
+    },
+    prefix: function () {
+        return "(" + this.sign + " " + this.stringization(expr => expr.prefix()) + ")"
+    },
+    postfix: function () {
+        return "(" + this.stringization(expr => expr.prefix()) + " " + this.sign + ")"
+    },
+    evaluate: function (x, y, z) {
+        return this.calc(...this.exprs.map(expr => expr.evaluate(x, y, z)))
+    },
 }
 
 function Const(value) {
     this.value = value;
 }
 
-Const.prototype.evaluate = function () {
-    return this.value
-};
-Const.prototype.toString = function () {
-    return this.value + ""
-};
-Const.prototype.prefix = Const.prototype.toString;
-Const.prototype.postfix = Const.prototype.toString;
+Const.prototype = {
+    toString: function () {
+        return this.value + ""
+    },
+    prefix: function () {
+        return this.toString()
+    },
+    postfix: function () {
+        return this.toString()
+    },
+    evaluate: function () {
+        return this.value
+    }
+}
 
 function Variable(name) {
     this.name = name;
 }
 
-Variable.prototype.evaluate = function (x, y, z) {
-    return this.name === "x" ? x : (this.name === "y" ? y : (this.name === "z" ? z : Infinity))
-};
-Variable.prototype.toString = function () {
-    return this.name;
+Variable.prototype = {
+    toString: function () {
+        return this.name
+    },
+    prefix: function () {
+        return this.toString()
+    },
+    postfix: function () {
+        return this.toString()
+    },
+    evaluate: function (x, y, z) {
+        return this.name === "x" ? x : (this.name === "y" ? y : (this.name === "z" ? z : Infinity))
+    },
 }
-Variable.prototype.prefix = Variable.prototype.toString;
-Variable.prototype.postfix = Variable.prototype.toString;
 
 function Negate(...exprs) {
     UnlimitedOperation.call(this, (x) => -x, "negate", ...exprs);
@@ -105,33 +106,14 @@ function Sinh(...exprs) {
 Sinh.prototype = Object.create(UnlimitedOperation.prototype);
 
 function Mean(...exprs) {
-    UnlimitedOperation.call(this,
-        (...args) => {
-        // reduce or map
-            let sum = 0;
-            for (let i = 0; i < args.length; i++) {
-                sum += args[i];
-            }
-            return sum / args.length;
-        }, "mean", ...exprs);
+    UnlimitedOperation.call(this, (...args) => args.reduce((prev, cur) => prev + cur) / args.length, "mean", ...exprs);
 }
 
 Mean.prototype = Object.create(UnlimitedOperation.prototype);
 
 function Var(...args) {
-    return new UnlimitedOperation(
-        (...args) => {
-            let sum = 0;
-            let sumkv = 0;
-            for (let i = 0; i < args.length; i++) {
-                sum += args[i];
-                sumkv += args[i] * args[i];
-            }
-            return sumkv / args.length - (sum / args.length) * (sum / args.length);
-        }, "var", ...args
-    );
+    return new UnlimitedOperation((...args) => (args.reduce((prev, cur) => prev + cur ** 2, 0) / args.length) - (args.reduce((prev, cur) => prev + cur) / args.length) ** 2, "var", ...args);
 }
-
 
 function split(str) {
     let result = []
