@@ -11,6 +11,9 @@ function Const(value) {
     this.prefix = function () {
         return value + "";
     }
+    this.postfix = function () {
+        return value + "";
+    }
 }
 
 function Variable(name) {
@@ -22,6 +25,10 @@ function Variable(name) {
     }
 
     this.prefix = function () {
+        return name;
+    }
+
+    this.postfix = function () {
         return name;
     }
 }
@@ -36,6 +43,11 @@ function UnaryOperation(expr, f, sign) {
     this.prefix = function () {
         return "(" + sign + " " + expr.prefix() + ")";
     }
+
+    this.postfix = function () {
+        return "(" + expr.postfix() + " " + sign + ")";
+    }
+
 }
 
 function Negate(expr) {
@@ -51,6 +63,9 @@ function BinaryOperation(expr1, expr2, f, sign) {
     }
     this.prefix = function () {
         return "(" + sign + " " + expr1.prefix() + " " + expr2.prefix() + ")";
+    }
+    this.postfix = function () {
+        return "(" + expr1.postfix() + " " + expr2.postfix() + " " + sign + ")";
     }
 }
 
@@ -131,44 +146,88 @@ function parse(str) {
     return stack.pop();
 }
 
+function skipWhitespace(str, i) {
+    for (; i < str.length && str[i] === ' '; i++) ;
+    return i;
+}
+
+function expect(str, i, sign) {
+    if (!(i < str.length && str[i] === sign)) {
+        throw Error("Expect " + sign + " got " + str[i]);
+    }
+}
+
+function parseOp(str, i) {
+    if (i >= str.length) {
+        throw Error("Unexpected EOF");
+    }
+    if (str[i] === '+' || str[i] === '-' || str[i] === '*' || str[i] === '/') {
+        if (i + 1 < str.length && isNaN(parseFloat(str[i + 1])))
+            return [str[i], i + 1];
+    } else if (!('a' <= str[i] && str[i] <= 'z')) {
+        throw Error("Expect operation");
+    } else {
+        let j;
+        for (j = i; j < str.length && 'a' <= str[j] && str[j] <= 'z'; j++) ;
+        if (j < str.length && isNaN(parseFloat(str[i + 1])))
+            return [str.substring(i, j), j];
+    }
+    throw Error("Expect operation");
+}
+
+function parseElem(str, i, parseBracket) {
+    i = skipWhitespace(str, i);
+    if (i >= str.length) {
+        throw Error("Unexpected EOF");
+    }
+    let res;
+    if (str[i] === '(') {
+        return parseBracket(str, i);
+    }
+    if (str[i] === 'x' || str[i] === 'y' || str[i] === 'z') {
+        return [new Variable(str[i]), i + 1]
+    }
+    let j;
+    for (j = i; j < str.length && (j === i && (str[j] === '-' || str[j] === '+') || !isNaN(parseFloat(str[j]))); j++) ;
+    let num = parseFloat(str.substring(i, j));
+    if (!isNaN(num)) {
+        return [new Const(num), j];
+    }
+    throw Error("Expect bracket, number or variable, got " + str[i]);
+}
+
+function makeUnaryOperation(op, expr) {
+    if (op === "negate")
+        return new Negate(expr);
+    if (op === "cosh")
+        return new Cosh(expr);
+    if (op === "sinh")
+        return new Sinh(expr);
+    throw Error("Unknown unary operation");
+}
+
+function makeBinaryOperation(op, first, second) {
+    if (op === "+")
+        return new Add(first, second);
+    if (op === "-")
+        return new Subtract(first, second);
+    if (op === "*")
+        return new Multiply(first, second);
+    if (op === "/")
+        return new Divide(first, second);
+    throw Error("Unknown binary operation");
+
+}
+
 function parsePrefix(str) {
     // println("parsePrefix: " + str);
-    let res = parseElem(str, 0);
+    let res = parseElem(str, 0, parseBracket);
     let i = res[1];
     i = skipWhitespace(str, i);
     if (i < str.length) {
         throw Error("Expected for EOF");
     }
     return res[0];
-
-    function skipWhitespace(str, i) {
-        for (; i < str.length && str[i] === ' '; i++) ;
-        return i;
-    }
-
-    function expect(str, i, sign) {
-        if (!(i < str.length && str[i] === sign)) {
-            throw Error("Expect " + sign + " got " + str[i]);
-        }
-    }
-
-    function parseOp(str, i) {
-        if (i >= str.length) {
-            throw Error("Unexpected EOF");
-        }
-        if (str[i] === '+' || str[i] === '-' || str[i] === '*' || str[i] === '/') {
-            if (i + 1 < str.length && (str[i + 1] === " " || str[i + 1] === '('))
-                return [str[i], i + 1];
-        } else if (!('a' <= str[i] && str[i] <= 'z')) {
-            throw Error("Expect operation");
-        } else {
-            let j;
-            for (j = i; j < str.length && 'a' <= str[j] && str[j] <= 'z'; j++) ;
-            if (j < str.length && (str[j] === " " || str[j] === '('))
-                return [str.substring(i, j), j];
-        }
-        throw Error("Expect operation");
-    }
 
     function parseBracket(str, i) {
         i = skipWhitespace(str, i);
@@ -179,61 +238,70 @@ function parsePrefix(str) {
         let op = res[0];
         i = res[1];
         i = skipWhitespace(str, i);
-        res = parseElem(str, i);
+        res = parseElem(str, i, parseBracket);
         let first = res[0];
         i = res[1];
         i = skipWhitespace(str, i);
         if (str[i] === ')') {
             i++;
-            if (op === "negate") {
-                res = new Negate(first);
-            } else if (op === "cosh") {
-                res = new Cosh(first);
-            } else if (op === "sinh") {
-                res = new Sinh(first);
-            } else {
-                throw Error("Unknown unary operation");
-            }
+            res = makeUnaryOperation(op, first);
             return [res, i];
         }
-        res = parseElem(str, i);
+        res = parseElem(str, i, parseBracket);
         let second = res[0];
         i = res[1];
         i = skipWhitespace(str, i);
         expect(str, i, ")");
         i++;
-        if (op === "+") {
-            res = new Add(first, second);
-        } else if (op === "-") {
-            res = new Subtract(first, second);
-        } else if (op === "*") {
-            res = new Multiply(first, second);
-        } else if (op === "/") {
-            res = new Divide(first, second);
-        } else {
-            throw Error("Unknown binary operation");
-        }
+        res = makeBinaryOperation(op, first, second);
         return [res, i];
     }
+}
 
-    function parseElem(str, i) {
+function elemStarts(str, i) {
+    return i < str.length && (str[i] === "(" || str[i] === "x" || str[i] === "y" || str[i] === "z" || str[i] === "-" || !isNaN(parseFloat(str[i])))
+}
+
+function parsePostfix(str) {
+    // println("parsePrefix: " + str);
+    let res = parseElem(str, 0, parseBracket);
+    let i = res[1];
+    i = skipWhitespace(str, i);
+    if (i < str.length) {
+        throw Error("Expected for EOF");
+    }
+    return res[0];
+
+    function parseBracket(str, i) {
         i = skipWhitespace(str, i);
-        if (i >= str.length) {
-            throw Error("Unexpected EOF");
+        expect(str, i, "(");
+        i++;
+        i = skipWhitespace(str, i);
+        let res = parseElem(str, i, parseBracket);
+        let first = res[0];
+        i = res[1];
+        i = skipWhitespace(str, i);
+        if (!elemStarts(str, i)) {
+            res = parseOp(str, i);
+            let op = res[0];
+            i = res[1];
+            i = skipWhitespace(str, i);
+            expect(str, i, ")");
+            i++;
+            res = makeUnaryOperation(op, first);
+            return [res, i];
         }
-        let res;
-        if (str[i] === '(') {
-            return parseBracket(str, i);
-        }
-        if (str[i] === 'x' || str[i] === 'y' || str[i] === 'z') {
-            return [new Variable(str[i]), i + 1]
-        }
-        let j;
-        for (j = i; j < str.length && (j === i && (str[j] === '-' || str[j] === '+') || !isNaN(parseFloat(str[j]))); j++) ;
-        let num = parseFloat(str.substring(i, j));
-        if (!isNaN(num)) {
-            return [new Const(num), j];
-        }
-        throw Error("Expect bracket, number or variable, got " + str[i]);
+        res = parseElem(str, i, parseBracket);
+        let second = res[0];
+        i = res[1];
+        i = skipWhitespace(str, i);
+        res = parseOp(str, i);
+        let op = res[0];
+        i = res[1];
+        i = skipWhitespace(str, i);
+        expect(str, i, ")");
+        i++;
+        res = makeBinaryOperation(op, first, second);
+        return [res, i];
     }
 }
