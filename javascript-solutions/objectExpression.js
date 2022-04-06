@@ -54,6 +54,9 @@ function Negate(expr) {
     return new UnaryOperation(expr, x => -x, "negate");
 }
 
+// :NOTE: no prototype use
+// :NOTE: a class for each arity is insufficient
+
 function BinaryOperation(expr1, expr2, f, sign) {
     this.toString = function () {
         return expr1.toString() + " " + expr2.toString() + " " + sign;
