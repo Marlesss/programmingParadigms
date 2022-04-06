@@ -33,7 +33,7 @@ UnlimitedOperation.prototype.postfix = function () {
     for (let i = 0; i < this.exprs.length; i++) {
         res += this.exprs[i].postfix() + " ";
     }
-    return "(" + res + sign + ")";
+    return "(" + res + this.sign + ")";
 }
 
 function Const(value) {
