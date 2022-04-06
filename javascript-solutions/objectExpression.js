@@ -1,147 +1,122 @@
 "use strict";
 
+
 function UnlimitedOperation(f, sign, ...exprs) {
-    // this.f = f;
-    // this.sign = sign;
-    // this.exprs = exprs;
-    this.toString = function () {
-        let res = "";
-        for (let i = 0; i < args.length; i++) {
-            res += exprs[i].toString() + " ";
-        }
-        return res + sign;
+    this.f = f;
+    this.sign = sign;
+    this.exprs = exprs
+}
+
+UnlimitedOperation.prototype.toString = function () {
+    let res = "";
+    for (let i = 0; i < this.exprs.length; i++) {
+        res += this.exprs[i].toString() + " ";
     }
-    this.evaluate = function (x, y, z) {
-        // println(exprs);
-        let resArgs = []
-        for (let i = 0; i < exprs.length; i++) {
-            resArgs.push(exprs[i].evaluate(x, y, z));
-        }
-        return f(...resArgs);
+    return res + this.sign;
+}
+UnlimitedOperation.prototype.evaluate = function (x, y, z) {
+    let resArgs = []
+    for (let i = 0; i < this.exprs.length; i++) {
+        resArgs.push(this.exprs[i].evaluate(x, y, z));
     }
-    this.prefix = function () {
-        let res = sign;
-        for (let i = 0; i < exprs.length; i++) {
-            res += " " + exprs[i].prefix();
-        }
-        return "(" + res + ")";
+    return this.f(...resArgs);
+}
+UnlimitedOperation.prototype.prefix = function () {
+    let res = this.sign;
+    for (let i = 0; i < this.exprs.length; i++) {
+        res += " " + this.exprs[i].prefix();
     }
-    this.postfix = function () {
-        let res = "";
-        for (let i = 0; i < exprs.length; i++) {
-            res += exprs[i].postfix() + " ";
-        }
-        return "(" + res + sign + ")";
+    return "(" + res + ")";
+}
+UnlimitedOperation.prototype.postfix = function () {
+    let res = "";
+    for (let i = 0; i < this.exprs.length; i++) {
+        res += this.exprs[i].postfix() + " ";
     }
+    return "(" + res + sign + ")";
 }
 
 function Const(value) {
-    this.toString = function () {
-        return value + "";
-    }
-    this.evaluate = function () {
-        return value;
-    }
-
-    this.prefix = function () {
-        return value + "";
-    }
-    this.postfix = function () {
-        return value + "";
-    }
+    this.value = value;
 }
+
+Const.prototype.evaluate = function () {
+    return this.value
+};
+Const.prototype.toString = function () {
+    return this.value + ""
+};
+Const.prototype.prefix = Const.prototype.toString;
+Const.prototype.postfix = Const.prototype.toString;
 
 function Variable(name) {
-    this.toString = function () {
-        return name;
-    }
-    this.evaluate = function (x, y, z) {
-        return name === "x" ? x : (name === "y" ? y : (name === "z" ? z : Infinity));
-    }
-
-    this.prefix = function () {
-        return name;
-    }
-
-    this.postfix = function () {
-        return name;
-    }
+    this.name = name;
 }
 
-function UnaryOperation(expr, f, sign) {
-    this.toString = function () {
-        return expr.toString() + " " + sign;
-    }
-    this.evaluate = function (x, y, z) {
-        return f(expr.evaluate(x, y, z));
-    }
-    this.prefix = function () {
-        return "(" + sign + " " + expr.prefix() + ")";
-    }
+Variable.prototype.evaluate = function (x, y, z) {
+    return this.name === "x" ? x : (this.name === "y" ? y : (this.name === "z" ? z : Infinity))
+};
+Variable.prototype.toString = function () {
+    return this.name;
+}
+Variable.prototype.prefix = Variable.prototype.toString;
+Variable.prototype.postfix = Variable.prototype.toString;
 
-    this.postfix = function () {
-        return "(" + expr.postfix() + " " + sign + ")";
-    }
 
+function Negate(...exprs) {
+    UnlimitedOperation.call(this, (x) => -x, "negate", ...exprs);
 }
 
-function Negate(expr) {
-    return new UnaryOperation(expr, x => -x, "negate");
+Negate.prototype = Object.create(UnlimitedOperation.prototype);
+
+function Add(...exprs) {
+    UnlimitedOperation.call(this, (a, b) => a + b, "+", ...exprs);
 }
 
-// :NOTE: no prototype use
-// :NOTE: a class for each arity is insufficient
+Add.prototype = Object.create(UnlimitedOperation.prototype);
 
-function BinaryOperation(expr1, expr2, f, sign) {
-    this.toString = function () {
-        return expr1.toString() + " " + expr2.toString() + " " + sign;
-    }
-    this.evaluate = function (x, y, z) {
-        return f(expr1.evaluate(x, y, z), expr2.evaluate(x, y, z));
-    }
-    this.prefix = function () {
-        return "(" + sign + " " + expr1.prefix() + " " + expr2.prefix() + ")";
-    }
-    this.postfix = function () {
-        return "(" + expr1.postfix() + " " + expr2.postfix() + " " + sign + ")";
-    }
+function Subtract(...exprs) {
+    UnlimitedOperation.call(this, (a, b) => a - b, "-", ...exprs);
 }
 
-function Add(expr1, expr2) {
-    return new BinaryOperation(expr1, expr2, (a, b) => a + b, "+");
+Subtract.prototype = Object.create(UnlimitedOperation.prototype);
+
+function Multiply(...exprs) {
+    UnlimitedOperation.call(this, (a, b) => a * b, "*", ...exprs);
 }
 
-function Subtract(expr1, expr2) {
-    return new BinaryOperation(expr1, expr2, (a, b) => a - b, "-");
+Multiply.prototype = Object.create(UnlimitedOperation.prototype);
+
+function Divide(...exprs) {
+    UnlimitedOperation.call(this, (a, b) => a / b, "/", ...exprs);
 }
 
-function Multiply(expr1, expr2) {
-    return new BinaryOperation(expr1, expr2, (a, b) => a * b, "*");
+Divide.prototype = Object.create(UnlimitedOperation.prototype);
+
+function Cosh(...exprs) {
+    UnlimitedOperation.call(this, Math.cosh, "cosh", ...exprs);
 }
 
-function Divide(expr1, expr2) {
-    return new BinaryOperation(expr1, expr2, (a, b) => a / b, "/");
+Cosh.prototype = Object.create(UnlimitedOperation.prototype);
+
+function Sinh(...exprs) {
+    UnlimitedOperation.call(this, Math.sinh, "sinh", ...exprs);
 }
 
-function Cosh(expr1) {
-    return new UnaryOperation(expr1, Math.cosh, "cosh");
-}
+Sinh.prototype = Object.create(UnlimitedOperation.prototype);
 
-function Sinh(expr1) {
-    return new UnaryOperation(expr1, Math.sinh, "sinh");
-}
-
-function Mean(...args) {
-    return new UnlimitedOperation(
+function Mean(...exprs) {
+    UnlimitedOperation.call(this,
         (...args) => {
             let sum = 0;
             for (let i = 0; i < args.length; i++) {
                 sum += args[i];
             }
             return sum / args.length;
-        }, "mean", ...args
-    );
+        }, "mean", ...exprs);
 }
+
+Mean.prototype = Object.create(UnlimitedOperation.prototype);
 
 function Var(...args) {
     return new UnlimitedOperation(
