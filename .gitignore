@@ -41,3 +41,12 @@ _*
 /javascript-solutions/.gitattributes
 /javascript-solutions/jstest/
 /javascript-solutions/examples.js
+/clojure-solutions/cljtest/
+/clojure-solutions/examples/
+/clojure-solutions/lib/
+/clojure-solutions/.gitattributes
+/clojure-solutions/RunClojure.cmd
+/clojure-solutions/TestClojure.cmd
+/clojure-solutions/examples.clj
+/clojure-solutions/RunClojure.sh
+/clojure-solutions/TestClojure.sh
