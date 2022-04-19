@@ -44,21 +44,6 @@
              (- (* (nth v1 0) (nth v2 1)) (* (nth v1 1) (nth v2 0)))])]
     (reduce binvect vecs)))
 (defn is-matrix [n m matr] (and (vector? matr) (== (count matr) n) (all vector? matr) (all (fn [v] (== (count v) m)) matr)))
-(defn mop [f matrs]
-  {:pre  [(seq? matrs)
-          (>= (count matrs) 2)
-          (vector? (first matrs))
-          (vector? (first (first matrs)))
-          (all (partial is-matrix (count (first matrs)) (count (first (first matrs)))) matrs)]
-   :post [is-matrix (count (first matrs)) (count (first (first matrs))) %]}
-  (let [n (count (first matrs))
-        m (count (first (first matrs)))]
-    (letfn [(binmop [m1 m2]
-              {:pre  [(is-matrix n m m1)
-                      (is-matrix n m m2)]
-               :post [(is-matrix n m %)]}
-              (into [] (for [i (range 0 n)] (f (nth m1 i) (nth m2 i)))))]
-      (reduce (fn [m1 m2] (binmop m1 m2)) matrs))))
 (defn m+ [& matrs] (vop v+ matrs))
 (defn m- [& matrs] (vop v- matrs))
 (defn m* [& matrs] (vop v* matrs))
@@ -75,7 +60,8 @@
 (defn m*m [& matrs]
   {:pre  [(seq? matrs)
           (not (zero? (count matrs)))
-          (all (fn [m] (and (vector? m) (vector? (first m)) (is-matrix (count m) (count (first m)) m))) matrs)]
+          (all (fn [m] (and (vector? m) (vector? (first m)) (is-matrix (count m) (count (first m)) m))) matrs)
+          (all true? (for [i (range 0 (dec (count matrs)))] (== (count (first (nth matrs i))) (count (nth matrs (inc i))))))]
    :post [(is-matrix (count (first matrs)) (count (first (last matrs))) %)]}
   (letfn [(binm*m [m1 m2]
             {:pre  [(vector? m1)
