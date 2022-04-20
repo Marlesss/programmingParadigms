@@ -1,0 +1,61 @@
+commit 2236fc25d01773708d83609e9a2dccc18f8d58ae
+Author: Marlesss <60238634+Marlesss@users.noreply.github.com>
+Date:   Wed Apr 20 14:23:45 2022 +0300
+
+    HW9 big code clean-up
+==================================================
+Tests: running
+WARNING: A command line option has enabled the Security Manager
+WARNING: The Security Manager is deprecated and will be removed in a future release
+Testing Base
+WARNING: load-file already refers to: #'clojure.core/load-file in namespace: user, being replaced by: #'user/load-file
+    2 arg(s)
+    1 arg(s)
+class clojure.lang.Var
+Exception in thread "main" jstest.EngineException: No error expected in (v*s (vector))
+	at cljtest.ClojureScript.call(Unknown Source)
+	at cljtest.ClojureScript$F.call(Unknown Source)
+	at cljtest.linear.Item$Fun.lambda$test$0(Unknown Source)
+	at cljtest.linear.Item$Fun.lambda$test$1(Unknown Source)
+	at base.TestCounter.lambda$test$0(Unknown Source)
+	at base.TestCounter.lambda$testV$2(Unknown Source)
+	at base.Log.silentScope(Unknown Source)
+	at base.TestCounter.testV(Unknown Source)
+	at base.TestCounter.test(Unknown Source)
+	at cljtest.linear.Item$Fun.test(Unknown Source)
+	at cljtest.linear.Item$Fun.test(Unknown Source)
+	at cljtest.linear.Item$Fun.test(Unknown Source)
+	at cljtest.linear.LinearTester.test(Unknown Source)
+	at cljtest.linear.LinearTester.lambda$runTest$21(Unknown Source)
+	at base.Log.lambda$action$0(Unknown Source)
+	at base.Log.silentScope(Unknown Source)
+	at base.Log.scope(Unknown Source)
+	at base.Log.scope(Unknown Source)
+	at cljtest.linear.LinearTester.runTest(Unknown Source)
+	at cljtest.linear.LinearTester.test(Unknown Source)
+	at cljtest.linear.LinearTest.lambda$v$0(Unknown Source)
+	at base.Selector.lambda$test$2(Unknown Source)
+	at base.Log.lambda$action$0(Unknown Source)
+	at base.Log.silentScope(Unknown Source)
+	at base.Log.scope(Unknown Source)
+	at base.Log.scope(Unknown Source)
+	at base.Selector.lambda$test$3(Unknown Source)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at base.Selector.test(Unknown Source)
+	at base.Selector.main(Unknown Source)
+	at cljtest.linear.FullLinearTest.main(Unknown Source)
+Caused by: clojure.lang.ArityException: Wrong number of args (0) passed to: user/v*s/fn--181
+	at clojure.lang.AFn.throwArity(AFn.java:429)
+	at clojure.lang.AFn.invoke(AFn.java:28)
+	at clojure.core.protocols$fn__8156.invokeStatic(protocols.clj:78)
+	at clojure.core.protocols$fn__8156.invoke(protocols.clj:75)
+	at clojure.core.protocols$fn__8110$G__8105__8123.invoke(protocols.clj:13)
+	at clojure.core$reduce.invokeStatic(core.clj:6826)
+	at clojure.core$reduce.invoke(core.clj:6812)
+	at user$v_STAR_s.invokeStatic(linear.clj:18)
+	at user$v_STAR_s.doInvoke(linear.clj:15)
+	at clojure.lang.RestFn.invoke(RestFn.java:410)
+	at clojure.lang.Var.invoke(Var.java:384)
+	at cljtest.ClojureScript.callUnsafe(Unknown Source)
+	... 31 more
+ERROR: Tests: failed
