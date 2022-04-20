@@ -16,8 +16,8 @@
   {:pre  [(vector? v) (all number? scalars)]
    :post [(sameForm % v)]}
   (let [mnozh (apply * scalars)] (mapv #(* % mnozh) v)))
-(defn scalar [v1 v2]
-  {:pre  [(vector? v1) (vector? v2) (== (count v1) (count v2))]
+(defn scalar [& vecs]
+  {:pre  [(all vector? vecs) (apply == (mapv count vecs))]
    :post [(number? %)]}
   (apply + (v* v1 v2)))
 (defn vect [& vecs]
