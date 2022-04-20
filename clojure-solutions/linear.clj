@@ -19,7 +19,7 @@
 (defn scalar [& vecs]
   {:pre  [(all vector? vecs) (apply == (mapv count vecs))]
    :post [(number? %)]}
-  (apply + (v* v1 v2)))
+  (apply + (apply v* vecs)))
 (defn vect [& vecs]
   {:pre  [(all vector? vecs) (all #(== (count %) 3) vecs)]
    :post [(vector? %) (== (count %) 3)]}
