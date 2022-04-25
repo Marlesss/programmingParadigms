@@ -1,0 +1,15 @@
+(defn constant [c] (constantly c))
+(defn variable [var] (fn [map] (get map var)))
+(defn operation [f neutral & exprs]
+  (let [exprs (if (== (count exprs) 1) (conj exprs (constant neutral)) exprs)]
+    (fn [map] (reduce f (mapv #(% map) exprs)))))
+(defn add [& exprs] (apply operation + 0 exprs))
+(defn subtract [& exprs] (apply operation - 0 exprs))
+(defn multiply [& exprs] (apply operation * 1 exprs))
+(defn divide [& exprs] (apply operation (fn [^double x ^double y] (/ x y)) 1 exprs)) ;; (apply / [1.0 0.0])
+(defn negate [expr] (subtract expr))
+(def funcs {"+" add "-" subtract "*" multiply "/" divide "negate" negate})
+(defn parser [inp] (if (seq? inp)
+                     (apply (get funcs (name (first inp))) (mapv parser (rest inp)))
+                     (if (number? inp) (constant inp) (variable (name inp)))))
+(defn parseFunction [inp] (parser (read-string inp)))

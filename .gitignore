@@ -6,6 +6,7 @@
 *Tester.java
 /java-solutions/expression/common/
 /out/*
+*package-info.java
 # Do not store anything starting with _
 _*
 
