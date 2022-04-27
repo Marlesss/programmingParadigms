@@ -1,3 +1,6 @@
+;; hard pls
+;; hard pls
+;; hard pls
 (defn less-eps [x] (<= (if (>= x 0) x (- x)) 1/1000))
 (defn sameForm [& elems] (or (every? number? elems) (and (every? vector? elems) (apply == (mapv count elems))
                                                          (every? true? (apply mapv sameForm elems)))))
