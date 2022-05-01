@@ -33,7 +33,7 @@
 (defn md [& matrs] (apply vop vd matrs))
 (defn m*s [matr & scalars] {:pre [(isMatrix? matr) (every? number? scalars)] :post [(sameForm matr %)]} (forAllNumbers #(* % (apply * scalars)) matr))
 (defn m*v [matr & vecs] {:pre [(isMatrix? matr) (every? vector? vecs)] :post [(vector? %) (== (count %) (count matr))]}
-  (reduce #(mapv (fn [st] (apply + (v* st %2))) %1) matr vecs))
+  (reduce #(mapv (fn [st] (apply + (v* st %2))) %1) matr vecs)) ; :NOTE:/2 could've used scalar
 (defn m*m [& matrs]
   {:pre  [(every? isMatrix? matrs) (every? true? (for [i (range 0 (dec (count matrs)))]
                                                    (== (count (first (nth matrs i))) (count (nth matrs (inc i))))))]
