@@ -26,8 +26,8 @@
 (defn Constant [value]
   {:value    value
    :toString (fn [this] (str (_value this)))
-   :evaluate (fn [this vars] (_value this))
-   :diff     (fn [this var] (Constant 0))})
+   :evaluate (fn [this _vars] (_value this))
+   :diff     (fn [_this _var] (Constant 0))})
 (defn Variable [value]
   {:value    value
    :toString _value
@@ -62,8 +62,16 @@
                            (Divide (Subtract (Multiply (diff first var) second) (Multiply (diff second var) first))
                                    (Multiply second second))))))
 (defn Negate [expr] (_Operation - "negate" 0 expr))
-(defn Pow [expr1 expr2] (_Operation #(Math/pow %1 %2) "pow" 0 expr1 expr2))
-(defn Log [expr1 expr2] (_Operation #(/ (Math/log (abs %2)) (Math/log (abs %1))) "log" 0 expr1 expr2))
+(defn Log [expr1 expr2]
+  (assoc (_Operation #(/ (Math/log (abs %2)) (Math/log (abs %1))) "log" 0 expr1 expr2)
+    :diff (fn [this var] (let [x (first (_exprs this)) y (nth (_exprs this) 1)]
+                           (if (and (contains? x :value) (number? (get x :value)) (== (get x :value) Math/E))
+                             (Divide (diff y var) y)
+                             (diff (Divide (Log (Constant Math/E) y) (Log (Constant Math/E) x)) var))))))
+(defn Pow [expr1 expr2]
+  (assoc (_Operation #(Math/pow %1 %2) "pow" 0 expr1 expr2)
+    :diff (fn [this var] (let [x (first (_exprs this)) y (nth (_exprs this) 1)]
+                           (Multiply this (diff (Multiply y (Log (Constant Math/E) x)) var))))))
 (def funcs {"+" Add "-" Subtract "*" Multiply "/" Divide "negate" Negate "pow" Pow "log" Log})
 (defn parser [inp] (if (seq? inp)
                      (apply (get funcs (name (first inp))) (mapv parser (rest inp)))
