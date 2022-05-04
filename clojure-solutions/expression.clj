@@ -33,7 +33,9 @@
    :toString _value
    :evaluate (fn [this vars] (get vars (_value this)))
    :diff     (fn [this var] (if (= (_value this) var) (Constant 1) (Constant 0)))})
-(def _Operation)
+; :NOTE: common constants should be extracted
+
+(declare _Operation) ; :NOTE:/2 should've used declare instead of def
 (def OperationProto
   {:toString (fn [this] (str "(" (_sign this) " " (clojure.string/join " " (map toString (_exprs this))) ")"))
    :evaluate (fn [this vars]
@@ -55,6 +57,7 @@
             (if (== (count (_exprs this)) 1) (diff (first (_exprs this)) var)
                                              (Add (apply Multiply (diff (first (_exprs this)) var) (rest (_exprs this)))
                                                   (Multiply (diff (apply Multiply (rest (_exprs this))) var) (first (_exprs this))))))))
+; :NOTE: needs to be fixed: support for 0 arguments for multiply and add
 (defn Divide [& exprs]
   (assoc (apply _Operation (fn [^double x ^double y] (/ x y)) "/" 1 exprs)
     :diff (fn [this var] (let [exprs (if (== (count (_exprs this)) 1) (conj (_exprs this) (Constant (_neutral this))) (_exprs this))
@@ -64,7 +67,7 @@
 (defn Negate [expr] (_Operation - "negate" 0 expr))
 (defn Log [expr1 expr2]
   (assoc (_Operation #(/ (Math/log (abs %2)) (Math/log (abs %1))) "log" 0 expr1 expr2)
-    :diff (fn [this var] (let [x (first (_exprs this)) y (nth (_exprs this) 1)]
+    :diff (fn [this var] (let [x (first (_exprs this)) y (nth (_exprs this) 1)] ; :NOTE:/2 double comparison is flawed
                            (if (and (contains? x :value) (number? (get x :value)) (== (get x :value) Math/E))
                              (Divide (diff y var) y)
                              (diff (Divide (Log (Constant Math/E) y) (Log (Constant Math/E) x)) var))))))
