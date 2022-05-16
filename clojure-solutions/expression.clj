@@ -130,7 +130,7 @@
 
 (def ops #{"+" "-" "*" "/" "negate" "&" "|" "^"})
 
-(load-file "examples/parser.clj")
+(load-file "parser.clj")
 
 (defn -show [result]
   (if (-valid? result)
