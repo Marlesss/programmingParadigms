@@ -53,3 +53,10 @@ _*
 /clojure-solutions/TestClojure.sh
 /java-solutions/queue/Queues.java
 /clojure-solutions/data/
+/prolog-solutions/examples/
+/prolog-solutions/lib/
+/prolog-solutions/prtest/
+/prolog-solutions/TestProlog.sh
+/prolog-solutions/RunProlog.sh
+/prolog-solutions/TestProlog.cmd
+/prolog-solutions/RunProlog.cmd
